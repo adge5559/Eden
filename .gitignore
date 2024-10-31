@@ -1,30 +1,3 @@
-# Ignore Mac system files
-.DS_Store
-
-# Ignore node_modules (if using Node.js)
-node_modules/
-
-# Ignore build output
-dist/
-build/
-
-# Ignore .env files (contains sensitive information)
-.env
-.env.*
-
-# Ignore temporary files
-*.tmp
-*.log
-
-# Ignore VSCode specific settings
-.vscode/
-
-# Ignore OS generated files
-Thumbs.db
-*.DS_Store
-
-# Ignore npm package lock file if not used in version control
+node_modules
 package-lock.json
-
-# Ignore Yarn package lock file if not used in version control
-yarn.lock
+.env
