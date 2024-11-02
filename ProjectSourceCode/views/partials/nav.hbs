@@ -1,6 +1,7 @@
 <header>
-  <nav class="navbar navbar-expand-sm border-bottom">
+  <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #9DC183; border-bottom: 1px solid #388E3C;">
     <div class="container">
+      <a class="navbar-brand text-light" href="/">Eden</a>
       <button
         class="navbar-toggler ms-auto"
         type="button"
@@ -11,25 +12,24 @@
         aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+      
       <div class="collapse navbar-collapse" id="navbar-collapse">
-        <ul class="navbar-nav me-auto">
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
           <li class="nav-item">
-            <!-- Discover link -->
-            <a class="nav-item" href="/discover">Discover</a>
+            <a class="nav-link text-light" href="/discover">Discover</a>
           </li>
           <li class="nav-item">
-            <!-- Profile link -->
-            <a class="nav-item" href="/profile">Profile</a>
+            <a class="nav-link text-light" href="/profile">Profile</a>
           </li>
         </ul>
-        <div class="nav-item me-1">
-          <!-- Login link -->
-          <a class="nav-item me-1" href="/login">Login</a>
-        </div>
-        <div class="nav-item me-1">
-          <!-- Logout link -->
-          <a class="nav-item me-1" href="/logout">Logout</a>
-        </div>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item me-2">
+            <a class="btn btn-outline-light" href="/login">Login</a>
+          </li>
+          <li class="nav-item me-3">
+            <a class="btn btn-outline-light" href="/logout">Logout</a>
+          </li>
+        </ul>
       </div>
     </div>
   </nav>
