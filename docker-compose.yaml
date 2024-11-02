@@ -1,4 +1,9 @@
 services:
+  db:
+    image: postgres:14
+    env_file: .env
+    expose:
+      - '5432'
   web:
     image: node:lts
     user: 'node'
