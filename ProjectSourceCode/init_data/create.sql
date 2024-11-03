@@ -1,0 +1,70 @@
+-- Force Clear
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Posts;
+DROP TABLE IF EXISTS Tags;
+DROP TABLE IF EXISTS PostTags;
+DROP TABLE IF EXISTS Likes;
+DROP TABLE IF EXISTS Comments;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+-- Create User table
+CREATE TABLE IF NOT EXISTS Users (
+	UserID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(40) NOT NULL UNIQUE,
+    Passwords VARCHAR(16) NOT NULL,
+    ProfilePicPath VARCHAR(255)
+);
+
+-- Create Posts table
+CREATE TABLE IF NOT EXISTS Posts(
+	PostID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    Title VARCHAR(40) NOT NULL,
+    Descriptions TEXT NOT NULL,
+    ImgPath VARCHAR(60) NOT NULL,
+    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Create Tags table
+CREATE TABLE IF NOT EXISTS Tags(
+	TagID INT PRIMARY KEY AUTO_INCREMENT,
+    TagName VARCHAR(50) UNIQUE
+);
+
+-- Create PostTags table (associate Posts and Tags)
+CREATE TABLE IF NOT EXISTS PostTags(
+	PostID INT,
+    TagID INT,
+	FOREIGN KEY (PostID) REFERENCES Posts(PostID),
+    FOREIGN KEY (TagID) REFERENCES Tags(TagID)
+);
+
+-- Create Like table
+CREATE TABLE IF NOT EXISTS Likes (
+    LikeID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    PostID INT,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID)
+);
+
+-- Create Comments table
+CREATE TABLE IF NOT EXISTS Comments (
+    CommentID INT PRIMARY KEY AUTO_INCREMENT,
+    PostID INT,
+    UserID INT,
+    CommentText TEXT,
+    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID)
+);
+
+
+
+
+
