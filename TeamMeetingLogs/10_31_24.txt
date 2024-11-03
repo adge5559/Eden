@@ -1,0 +1,8 @@
+- Discussed what each team member will be in charge of for starting the project.
+	- Logged on the project board who is doing what, as well as assigned epics and points.
+
+- Started discussing our Team Meeting for the next week.
+
+- Each team member needs at least 3 commits by November 4th.
+
+
