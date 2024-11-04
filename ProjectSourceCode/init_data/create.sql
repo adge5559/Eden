@@ -17,14 +17,14 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Create User table
 CREATE TABLE IF NOT EXISTS Users (
     Username VARCHAR(255) PRIMARY KEY,
-    Passwords VARCHAR(255) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
     ProfilePicture VARBINARY(MAX)
 );
 
 -- Create Posts table
 CREATE TABLE IF NOT EXISTS Posts(
 	PostID INT PRIMARY KEY AUTO_INCREMENT,
-    Username INT,
+    Username VARCHAR,
     Title VARCHAR(40) NOT NULL,
     Descriptions TEXT NOT NULL,
     TitalImgPath VARCHAR(60) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS PostSections(
 CREATE TABLE IF NOT EXISTS Comments (
     CommentID INT PRIMARY KEY AUTO_INCREMENT,
     PostID INT,
-    Username INT,
+    Username VARCHAR,
     CommentText TEXT,
     CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (Username) REFERENCES Users(Username),
