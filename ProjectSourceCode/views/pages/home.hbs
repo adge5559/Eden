@@ -1,3 +1,9 @@
 <div class="container">
     <h2>Welcome to Eden</h2>
   <div class="row">
+    {{#each results}}
+    {{else}}
+      <p>No plants found.</p>
+    {{/each}}
+  </div>
+</div>
