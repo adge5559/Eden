@@ -1,5 +1,3 @@
-USE Eden_test;
-
 -- Force Clear
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -18,13 +16,13 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE IF NOT EXISTS Users (
     Username VARCHAR(255) PRIMARY KEY,
     Password VARCHAR(255) NOT NULL,
-    ProfilePicture VARBINARY(MAX)
+    ProfilePicture VARBINARY(32767) -- 32kb Pfp
 );
 
 -- Create Posts table
 CREATE TABLE IF NOT EXISTS Posts(
 	PostID INT PRIMARY KEY AUTO_INCREMENT,
-    Username VARCHAR,
+    Username VARCHAR(255) NOT NULL,
     Title VARCHAR(40) NOT NULL,
     Descriptions TEXT NOT NULL,
     TitalImgPath VARCHAR(60) NOT NULL,
@@ -69,7 +67,7 @@ CREATE TABLE IF NOT EXISTS PostSections(
 CREATE TABLE IF NOT EXISTS Comments (
     CommentID INT PRIMARY KEY AUTO_INCREMENT,
     PostID INT,
-    Username VARCHAR,
+    Username VARCHAR(255) NOT NULL,
     CommentText TEXT,
     CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (Username) REFERENCES Users(Username),
