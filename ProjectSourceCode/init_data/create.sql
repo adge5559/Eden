@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS Posts;
 DROP TABLE IF EXISTS Sections;
 DROP TABLE IF EXISTS Tags;
 DROP TABLE IF EXISTS PostTags;
-DROP TABLE IF EXISTS PostSections;
 DROP TABLE IF EXISTS Comments;
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -38,7 +37,9 @@ CREATE TABLE IF NOT EXISTS Sections(
     SectionTitle VARCHAR(255) NOT NULL,
     Content TEXT NOT NULL,
     ImgPath VARCHAR(60),
-    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    PostID INT,
+    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID)
 );
 
 -- Create Tags table
@@ -55,14 +56,6 @@ CREATE TABLE IF NOT EXISTS PostTags(
     FOREIGN KEY (TagID) REFERENCES Tags(TagID)
 );
 
--- Create PostsSections table
-CREATE TABLE IF NOT EXISTS PostSections(
-	PostID INT,
-    SectionID INT,
-    FOREIGN KEY (PostID) REFERENCES Posts(PostID),
-    FOREIGN KEY (SectionID) REFERENCES Sections(SectionID)
-);
-
 -- Create Comments table
 CREATE TABLE IF NOT EXISTS Comments (
     CommentID INT PRIMARY KEY AUTO_INCREMENT,
@@ -73,3 +66,4 @@ CREATE TABLE IF NOT EXISTS Comments (
     FOREIGN KEY (Username) REFERENCES Users(Username),
     FOREIGN KEY (PostID) REFERENCES Posts(PostID)
 );
+
