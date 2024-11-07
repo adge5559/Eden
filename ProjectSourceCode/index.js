@@ -16,6 +16,7 @@ const hbs = handlebars.create({
   partialsDir: __dirname + '/views/partials',
 });
 
+
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
@@ -40,3 +41,42 @@ app.get('/welcome', (req, res) => {
 
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
+
+//login.hbs
+//login
+app.get('/login', (req, res) => {
+  
+  res.render('pages/login');
+
+});
+
+app.post('/login', async (req, res) => {
+const username = req.body.username; // Get username from the request body
+const password = req.body.password; // Get password from the request body
+const query = 'SELECT * FROM users WHERE username = $1 LIMIT 1'; // Query to find user by username
+const values = [username];
+
+try {
+    const user = await db.one(query, values);  
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+        return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
+    }
+
+    req.session.user = {
+        username: user.username,
+    };
+    req.session.save();
+
+    res.redirect('/discover');
+} catch (err) {
+    console.log(err);
+    if (err.code === 0) { 
+        return res.redirect('/register');
+    }
+
+    res.render('pages/login', { message: 'An error occurred. Please try again.', error: true });
+}
+});
+
