@@ -58,6 +58,27 @@ app.get('/', (req, res) => {
 app.listen(3000);
 console.log('Server is listening on port 3000');
 
+//register
+app.get('/register', (req, res) => {
+  res.render('pages/register'); 
+});
+
+app.post('/register', async (req, res) => {
+  const { Username, Password } = req.body; 
+
+  try {
+    const hashedPassword = await bcrypt.hash(Password, 10);
+
+    await db.none('INSERT INTO users(Username, Password) VALUES($1, $2)', [Username, hashedPassword]);
+
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Error inserting user:', error.message || error);
+    res.redirect('/register');
+  }
+});
+
+
 //login.hbs
 //login
 app.get('/login', (req, res) => {
