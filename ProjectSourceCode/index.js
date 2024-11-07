@@ -17,6 +17,26 @@ const hbs = handlebars.create({
 });
 
 
+// database configuration
+const dbConfig = {
+  host: 'db', // the database server
+  port: 5432, // the database port
+  database: process.env.POSTGRES_DB, // the database name
+  user: process.env.POSTGRES_USER, // the user account to connect with
+  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+};
+const db = pgp(dbConfig);
+
+// test your database
+db.connect()
+  .then(obj => {
+    console.log('Database connection successful'); // you can view this message in the docker compose logs
+    obj.done(); // success, release the connection;
+  })
+  .catch(error => {
+    console.log('ERROR:', error.message || error);
+  });
+
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
@@ -38,9 +58,30 @@ app.get('/', (req, res) => {
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
-
 module.exports = app.listen(3000);
+
 console.log('Server is listening on port 3000');
+
+//register
+app.get('/register', (req, res) => {
+  res.render('pages/register'); 
+});
+
+app.post('/register', async (req, res) => {
+  const { Username, Password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(Password, 10);
+
+    await db.none('INSERT INTO users(username, password) VALUES($1, $2)', [Username, hashedPassword]);
+
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Error inserting user:', error.message || error);
+    res.redirect('/register');
+  }
+});
+
 
 //login.hbs
 //login
