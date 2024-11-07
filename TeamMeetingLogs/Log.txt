@@ -1,4 +1,7 @@
-
+11/8/24
+- Past Week:  set up docker, set up register page and connected it to the User Database
+- Demo: Demoed our Docker compose ability, as well as our homepage wit our NavBar
+- Next Week: Planning to work on our Login and Register Page, making sure they are connected with out User Database
 
 
 
