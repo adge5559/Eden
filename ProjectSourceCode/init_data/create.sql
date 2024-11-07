@@ -12,9 +12,9 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 
 -- Create User table
-CREATE TABLE IF NOT EXISTS Users (
+CREATE TABLE IF NOT EXISTS users (
     Username VARCHAR(255) PRIMARY KEY,
-    Password VARCHAR(255) NOT NULL,
+    Password CHAR(255) NOT NULL,
     ProfilePicture VARBINARY(32767) -- 32kb Pfp
 );
 
