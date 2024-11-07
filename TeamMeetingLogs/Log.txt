@@ -1,3 +1,9 @@
+
+
+
+
+
+10/31/24
 - Discussed what each team member will be in charge of for starting the project.
 	- Logged on the project board who is doing what, as well as assigned epics and points.
 
