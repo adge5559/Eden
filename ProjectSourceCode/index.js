@@ -55,7 +55,11 @@ app.get('/', (req, res) => {
     res.render('pages/home');
 });
 
-app.listen(3000);
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+module.exports = app.listen(3000);
+
 console.log('Server is listening on port 3000');
 
 //register
@@ -64,12 +68,12 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  const { Username, Password } = req.body; 
+  const { username, password } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(Password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.none('INSERT INTO users(Username, Password) VALUES($1, $2)', [Username, hashedPassword]);
+    await db.none('INSERT INTO users(username, password) VALUES($1, $2)', [username, hashedPassword]);
 
     res.redirect('/login');
   } catch (error) {
