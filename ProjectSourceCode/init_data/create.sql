@@ -1,6 +1,4 @@
--- Force Clear
--- SET FOREIGN_KEY_CHECKS = 0;
-
+-- Drop if table exists
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Posts;
 DROP TABLE IF EXISTS Sections;
@@ -8,7 +6,7 @@ DROP TABLE IF EXISTS Tags;
 DROP TABLE IF EXISTS PostTags;
 DROP TABLE IF EXISTS Comments;
 
--- SET FOREIGN_KEY_CHECKS = 1;
+
 
 
 -- Create User table
