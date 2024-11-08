@@ -1,67 +1,64 @@
 -- Drop if table exists
-DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Posts;
-DROP TABLE IF EXISTS Sections;
-DROP TABLE IF EXISTS Tags;
-DROP TABLE IF EXISTS PostTags;
-DROP TABLE IF EXISTS Comments;
-
-
-
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS sections;
+DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS posttags;
+DROP TABLE IF EXISTS comments;
 
 -- Create User table
 CREATE TABLE IF NOT EXISTS users (
-    Username VARCHAR(255) PRIMARY KEY,
-    Password VARCHAR(255) NOT NULL,
-    ProfilePicture VARCHAR(255) -- 32kb Pfp
+    username VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    profilepicture VARCHAR(255) -- 32kb Pfp
 );
 
--- Create Posts table
-CREATE TABLE IF NOT EXISTS Posts(
-	PostID INT PRIMARY KEY,
-    Username VARCHAR(255) NOT NULL,
-    Title VARCHAR(40) NOT NULL,
-    Descriptions TEXT NOT NULL,
-    TitalImgPath VARCHAR(60) NOT NULL,
-    Likes INT NOT NULL DEFAULT 0,
-    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    LastUpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (Username) REFERENCES users(Username)
+-- Create posts table
+CREATE TABLE IF NOT EXISTS posts(
+	postid INT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    title VARCHAR(40) NOT NULL,
+    descriptions TEXT NOT NULL,
+    titleimagepath VARCHAR(60) NOT NULL,
+    likes INT NOT NULL DEFAULT 0,
+    createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lastupdatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (username) REFERENCES users(username)
 );
 
--- Create Sections table
-CREATE TABLE IF NOT EXISTS Sections(
-	SectionID  INT PRIMARY KEY,
-    SectionTitle VARCHAR(255) NOT NULL,
-    Content TEXT NOT NULL,
-    ImgPath VARCHAR(60),
-    PostID INT,
-    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (PostID) REFERENCES Posts(PostID)
+-- Create sections table
+CREATE TABLE IF NOT EXISTS sections(
+	sectionid  INT PRIMARY KEY,
+    sectiontitle VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    imgpath VARCHAR(60),
+    postid INT,
+    createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (postid) REFERENCES posts(postid)
 );
 
--- Create Tags table
-CREATE TABLE IF NOT EXISTS Tags(
-	TagID INT PRIMARY KEY,
-    TagName VARCHAR(50) UNIQUE
+-- Create tags table
+CREATE TABLE IF NOT EXISTS tags(
+	tagid INT PRIMARY KEY,
+    tagname VARCHAR(50) UNIQUE
 );
 
--- Create PostTags table (associate Posts and Tags)
-CREATE TABLE IF NOT EXISTS PostTags(
-	PostID INT,
-    TagID INT,
-	FOREIGN KEY (PostID) REFERENCES Posts(PostID),
-    FOREIGN KEY (TagID) REFERENCES Tags(TagID)
+-- Create posttags table (associate posts and tags)
+CREATE TABLE IF NOT EXISTS posttags(
+	postid INT,
+    tagid INT,
+	FOREIGN KEY (postid) REFERENCES posts(postid),
+    FOREIGN KEY (tagid) REFERENCES tags(tagid)
 );
 
--- Create Comments table
-CREATE TABLE IF NOT EXISTS Comments (
-    CommentID INT PRIMARY KEY,
-    PostID INT,
-    Username VARCHAR(255) NOT NULL,
-    CommentText TEXT,
-    CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (Username) REFERENCES users(Username),
-    FOREIGN KEY (PostID) REFERENCES Posts(PostID)
+-- Create comment table
+CREATE TABLE IF NOT EXISTS comment (
+    commentid INT PRIMARY KEY,
+    postid INT,
+    username VARCHAR(255) NOT NULL,
+    commenttext TEXT,
+    createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (username) REFERENCES users(username),
+    FOREIGN KEY (postid) REFERENCES posts(postid)
 );
 

@@ -30,3 +30,30 @@ describe('Server!', () => {
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
 // ********************************************************************************
+
+describe('Testing register 1', () => {
+  it('test route should redirect to /login', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({username: 'Jane Doe', password: 'Then, he used his fight money to buy two of every animal on earth'})
+      .end((err, res) => {
+        res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/); // Expecting a redirect to /login with the mentioned Regex
+        done();
+      });
+  });
+});
+
+describe('Testing register 2', () => {
+  it('test route should render /register', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({username: 'Jane Doe', password: 'Then, he used his fight money to buy two of every animal on earth'})
+      .end((err, res) => {
+        res.should.have.status(200); // Expecting a success status code
+        res.should.be.html; // Expecting a HTML response
+        done();
+      });
+  });
+});
