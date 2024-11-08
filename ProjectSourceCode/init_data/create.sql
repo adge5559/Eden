@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS tags;
 DROP TABLE IF EXISTS posttags;
 DROP TABLE IF EXISTS comments;
 
--- Create User table
+-- Create users table
 CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS posttags(
     FOREIGN KEY (tagid) REFERENCES tags(tagid)
 );
 
--- Create comment table
-CREATE TABLE IF NOT EXISTS comment (
+-- Create comments table
+CREATE TABLE IF NOT EXISTS comments (
     commentid INT PRIMARY KEY,
     postid INT,
     username VARCHAR(255) NOT NULL,
