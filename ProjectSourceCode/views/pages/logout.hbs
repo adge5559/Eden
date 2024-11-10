@@ -1,10 +1,10 @@
-{{> head}}
-<div class="container mt-5">
-    <h1 class="text-center">Logout Successful</h1>
-    <p class="text-center">You have been logged out successfully.</p>
-    {{> message}}
-    <div class="mt-3">
-        <p>Want to login? <a href="/login">Login</a></p>
+{{> head}} <!--head partial-->
+<div class="container mt-5"> <!--bootstrap-->
+    <h1 class="text-center">Logout Successful</h1><!--centered logout confirmation-->
+    <p class="text-center">You have been logged out successfully.</p> <!--" "-->
+    {{> message}} <!--message partial has success or errors-->
+    <div class="mt-3"> <!--option to login again-->
+        <p>Want to login? <a href="/login">Login</a></p> <!--link to login page-->
     </div>
 </div>
-{{> footer}}
+{{> footer}} <!--footer partial-->
