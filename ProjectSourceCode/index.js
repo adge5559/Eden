@@ -49,10 +49,19 @@ app.use(
   })
 );
 
+// initialize session variables
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
+
 //paths
 
 app.get('/', (req, res) => {
-    res.render('pages/home');
+    res.render('pages/discover');
 });
 
 app.get('/welcome', (req, res) => {
@@ -105,26 +114,34 @@ app.post('/login', async (req, res) => {
   const values = [username];
 
   try {
-      const user = await db.one(query, values);
-      const match = await bcrypt.compare(password, user.password);
+      // Fetch user details from the database
+      const userSearch = await db.oneOrNone(query, values);
+      
+      // If no user is found, redirect to register
+      if (!userSearch) {
+          return res.render('pages/login', { message: 'User not found. Please register.', error: true });
+      }
 
+      // Compare the entered password with the stored hashed password
+      const match = await bcrypt.compare(password, userSearch.password);
+
+      // If passwords don't match, display an error message
       if (!match) {
           return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
       }
 
+      // Save user session
       req.session.user = {
-          username: user.username,
+          username: userSearch.username,
       };
       req.session.save();
 
+      // Redirect to the discover page upon successful login
       res.redirect('/discover');
   } catch (err) {
       console.log(err);
-      if (err.code === 0) {
-          return res.redirect('/register');
-      }
-
       res.render('pages/login', { message: 'An error occurred. Please try again.', error: true });
   }
 });
+
 
