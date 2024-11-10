@@ -116,26 +116,21 @@ app.post('/login', async (req, res) => {
   try {
       //get user details from the db
       const userSearch = await db.oneOrNone(query, values);
-      
       //if no user found send to register
       if (!userSearch) {
           return res.render('pages/login', { message: 'User not found. Please register.', error: true });
       }
-
       //compare the entered password with the stored hashed password
       const match = await bcrypt.compare(password, userSearch.password);
-
       //if passwords don't match error
       if (!match) {
           return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
       }
-
       //save user session
       req.session.user = {
           username: userSearch.username,
       };
       req.session.save();
-
       //send to the discover page if login is correct
       res.redirect('/discover');
   } catch (err) { //if error
