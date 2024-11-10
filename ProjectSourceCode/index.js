@@ -108,37 +108,37 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const username = req.body.username; // Get username from the request body
-  const password = req.body.password; // Get password from the request body
-  const query = 'SELECT * FROM users WHERE username = $1 LIMIT 1'; // Query to find user by username
+  const username = req.body.username; //get username
+  const password = req.body.password; //get password
+  const query = 'SELECT * FROM users WHERE username = $1 LIMIT 1'; //query to find user by username
   const values = [username];
 
   try {
-      // Fetch user details from the database
+      //get user details from the db
       const userSearch = await db.oneOrNone(query, values);
       
-      // If no user is found, redirect to register
+      //if no user found send to register
       if (!userSearch) {
           return res.render('pages/login', { message: 'User not found. Please register.', error: true });
       }
 
-      // Compare the entered password with the stored hashed password
+      //compare the entered password with the stored hashed password
       const match = await bcrypt.compare(password, userSearch.password);
 
-      // If passwords don't match, display an error message
+      //if passwords don't match error
       if (!match) {
           return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
       }
 
-      // Save user session
+      //save user session
       req.session.user = {
           username: userSearch.username,
       };
       req.session.save();
 
-      // Redirect to the discover page upon successful login
+      //send to the discover page if login is correct
       res.redirect('/discover');
-  } catch (err) {
+  } catch (err) { //if error
       console.log(err);
       res.render('pages/login', { message: 'An error occurred. Please try again.', error: true });
   }
