@@ -154,3 +154,8 @@ app.get('/logout', (req, res) => {
 });
 
 
+app.get('/profile', (req, res) => {
+  
+  res.render('pages/profile');
+
+});
