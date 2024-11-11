@@ -80,3 +80,10 @@ try {
 }
 });
 
+app.get('/discover', (req, res) => {
+  res.render('pages/home');
+});
+
+app.get('/profile', (req, res) => {
+  res.render('pages/profile');
+});
