@@ -143,4 +143,14 @@ app.post('/login', async (req, res) => {
   }
 });
 
+//logout
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+      if (err) {
+          return res.status(500).send('Unable to log out');
+      }
+      res.render('pages/logout', { message: 'Logged out Successfully' }); 
+  });
+});
+
 
