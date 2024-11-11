@@ -143,15 +143,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-app.get('/discover', (req, res) => {
-  res.render('pages/home');
-});
-
-app.get('/profile', (req, res) => {
-  res.render('pages/profile');
-});
-=======
 //logout
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
@@ -163,4 +154,3 @@ app.get('/logout', (req, res) => {
 });
 
 
->>>>>>> 0f19ecd89df39cfc43d129378f6d00e26fff8b0f
