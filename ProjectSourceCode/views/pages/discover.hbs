@@ -1,9 +1,37 @@
+<!-- views/pages/home.hbs -->
 <div class="container">
-    <h2>Welcome to Eden</h2>
+  <h2>Welcome to the Plant Collection</h2>
+  
+  <!-- Hardcoded Box with plant image and description -->
   <div class="row">
-    {{#each results}}
-    {{else}}
-      <p>No plantss found.</p>
-    {{/each}}
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <img src="/images/fern.jpg" class="card-img-top" alt="Plant Image" >
+        <div class="card-body">
+          <h5 class="card-title">Fern</h5>
+          <p class="card-text">This fern thrives in humid conditions and is perfect for indoor environments.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <img src="/images/catus.jpg" class="card-img-top" alt="Plant Image" onerror="this.src='/images/default-plant.jpg'">
+        <div class="card-body">
+          <h5 class="card-title">Cactus</h5>
+          <p class="card-text">A hardy plant that requires minimal care, great for dry climates and bright sunlight.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <img src="/images/succulent.jpg" class="card-img-top" alt="Plant Image" onerror="this.src='/images/default-plant.jpg'">
+        <div class="card-body">
+          <h5 class="card-title">Succulent</h5>
+          <p class="card-text">This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
