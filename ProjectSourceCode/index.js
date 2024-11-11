@@ -64,6 +64,10 @@ app.get('/', (req, res) => {
     res.render('pages/discover');
 });
 
+app.get('/discover', (req, res) => {
+  res.render('pages/discover');
+});
+
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
