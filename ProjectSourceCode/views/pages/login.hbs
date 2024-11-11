@@ -1,21 +1,26 @@
-{{> head}}
-<header>
-  <h1>Login Page</h1>
-</header>
-
-<form action="/login" method="POST">
-  <div class="mb-3">
-    <label for="username" class="form-label">Username</label>
-    <input type="text" name="username" id="username" class="form-control" required>
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">Password</label>
-    <input type="password" name="password" id="password" class="form-control" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Login</button>
-  <div class="mt-3">
-        <p>Don't have an account? <a href="/register">Register</a></p>
+{{> head}} <!--head partial has style and titles-->
+<div class="container mt-5"> <!--bootstrap -->
+  <header>
+    <h1>Login</h1> <!--page header-->
+  </header>
+  <!--login form goes to posts data to the login route -->
+  <form action="/login" method="POST">
+    <div class="form-group"> <!--form group for username input -->
+      <label for="username" class="form-label">Username:</label> <!--label for username input-->
+      <input type="text" name="username" id="username" class="form-control" required> <!--trxt input for username-->
     </div>
-</form>
- 
-{{> footer}} 
+    <br> 
+    <div class="form-group"> <!--form group for password input -->
+      <label for="password" class="form-label">Password:</label> <!--label for password input -->
+      <input type="password" name="password" id="password" class="form-control" required> <!-- text input for password -->
+    </div>
+    <br> 
+    <button type="submit" class="btn btn-primary mt-3">Login</button> <!--button has bootstrap-->
+    <div class="mt-3"> <!--register linkcontainter-->
+      <p>Don't have an account? <a href="/register">Register</a></p> <!--link to register page-->
+    </div>
+  </form>
+</div>
+
+{{> message}} <!--message partial for error or success messages -->
+{{> footer}} <!--footer partial-->

@@ -17,6 +17,26 @@ const hbs = handlebars.create({
 });
 
 
+// database configuration
+const dbConfig = {
+  host: 'db', // the database server
+  port: 5432, // the database port
+  database: process.env.POSTGRES_DB, // the database name
+  user: process.env.POSTGRES_USER, // the user account to connect with
+  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+};
+const db = pgp(dbConfig);
+
+// test your database
+db.connect()
+  .then(obj => {
+    console.log('Database connection successful'); // you can view this message in the docker compose logs
+    obj.done(); // success, release the connection;
+  })
+  .catch(error => {
+    console.log('ERROR:', error.message || error);
+  });
+
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
@@ -29,19 +49,60 @@ app.use(
   })
 );
 
+// initialize session variables
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
+
 //paths
 
 app.get('/', (req, res) => {
-    res.render('pages/home');
+    res.render('pages/discover');
+});
+
+app.get('/discover', (req, res) => {
+  res.render('pages/discover');
 });
 
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
-
 module.exports = app.listen(3000);
+
 console.log('Server is listening on port 3000');
 
+//register
+app.get('/register', (req, res) => {
+  res.render('pages/register'); 
+});
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const userSearch = await db.any('SELECT * FROM users WHERE username = $1', username);
+
+  if(userSearch.length != 0){
+    res.render('pages/register', {message: "There is already a user with that username"})
+  } else if(username.length == 0){
+    res.render('pages/register', {message: "You must provide a username"})
+  } else if(password.length == 0){
+    res.render('pages/register', {message: "You must provide a password"})
+  } else{
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await db.none('INSERT INTO users(username, password) VALUES($1, $2)', [username, hashedPassword]);
+
+      res.redirect('/login');
+    } catch (error) {
+      console.error('Error inserting user:', error.message || error);
+      res.render('/register');
+    }
+  }
+});
 //login.hbs
 //login
 app.get('/login', (req, res) => {
@@ -51,35 +112,38 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-const username = req.body.username; // Get username from the request body
-const password = req.body.password; // Get password from the request body
-const query = 'SELECT * FROM users WHERE username = $1 LIMIT 1'; // Query to find user by username
-const values = [username];
+  const username = req.body.username; //get username
+  const password = req.body.password; //get password
+  const query = 'SELECT * FROM users WHERE username = $1 LIMIT 1'; //query to find user by username
+  const values = [username];
 
-try {
-    const user = await db.one(query, values);  
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) {
-        return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
-    }
-
-    req.session.user = {
-        username: user.username,
-    };
-    req.session.save();
-
-    res.redirect('/discover');
-} catch (err) {
-    console.log(err);
-    if (err.code === 0) { 
-        return res.redirect('/register');
-    }
-
-    res.render('pages/login', { message: 'An error occurred. Please try again.', error: true });
-}
+  try {
+      //get user details from the db
+      const userSearch = await db.oneOrNone(query, values);
+      //if no user found send to register
+      if (!userSearch) {
+          return res.render('pages/login', { message: 'User not found. Please register.', error: true });
+      }
+      //compare the entered password with the stored hashed password
+      const match = await bcrypt.compare(password, userSearch.password);
+      //if passwords don't match error
+      if (!match) {
+          return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
+      }
+      //save user session
+      req.session.user = {
+          username: userSearch.username,
+      };
+      req.session.save();
+      //send to the discover page if login is correct
+      res.redirect('/discover');
+  } catch (err) { //if error
+      console.log(err);
+      res.render('pages/login', { message: 'An error occurred. Please try again.', error: true });
+  }
 });
 
+<<<<<<< HEAD
 app.get('/discover', (req, res) => {
   res.render('pages/home');
 });
@@ -87,3 +151,16 @@ app.get('/discover', (req, res) => {
 app.get('/profile', (req, res) => {
   res.render('pages/profile');
 });
+=======
+//logout
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+      if (err) {
+          return res.status(500).send('Unable to log out');
+      }
+      res.render('pages/logout', { message: 'Logged out Successfully' }); 
+  });
+});
+
+
+>>>>>>> 0f19ecd89df39cfc43d129378f6d00e26fff8b0f
