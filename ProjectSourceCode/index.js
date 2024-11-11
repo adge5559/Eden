@@ -153,7 +153,7 @@ app.get('/logout', (req, res) => {
   });
 });
 
-
+//pathing to profile
 app.get('/profile', (req, res) => {
   
   res.render('pages/profile');
