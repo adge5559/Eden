@@ -57,3 +57,27 @@ describe('Testing register 2', () => {
       });
   });
 });
+
+describe('Testing profile', () => {
+  it('should not accept wrong credentials and display you are not logged in profile page', async() => {
+    let agent = chai.request.agent(server);
+    await agent.post('/login').send({username: 'Jane Doe', password: 'Wrong password'});
+
+    const res = await agent.get("/profile")
+    res.should.have.status(200);
+    res.should.be.html;
+    expect(res.text.indexOf("You are not logged in") !== -1).to.equal(true)
+  });
+});
+
+describe('Testing profile', () => {
+  it('should accept credentials and display correct profile page', async() => {
+    let agent = chai.request.agent(server);
+    await agent.post('/login').send({username: 'Jane Doe', password: 'Then, he used his fight money to buy two of every animal on earth'});
+
+    const res = await agent.get("/profile")
+    res.should.have.status(200);
+    res.should.be.html;
+    expect(res.text.indexOf("Jane Doe") !== -1).to.equal(true)
+  });
+});

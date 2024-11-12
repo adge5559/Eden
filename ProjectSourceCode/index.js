@@ -166,9 +166,12 @@ app.get('/logout', (req, res) => {
 
 //pathing to profile
 app.get('/profile', (req, res) => {
-  
-  res.render('pages/profile');
-
+  const bruh = req.session.user?.username
+  if(bruh){
+    res.render('pages/profile', {error: true, user: req.session.user});
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
 });
 
 // Post page
