@@ -12,6 +12,7 @@
     <div class="post-container">
         <!-- Other post details here -->
         <div class="info-box">
+            {{!-- Link to author's profile --}}
             <p>
                 Posted by: 
                 <a href="/profile/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
@@ -32,6 +33,15 @@
                 <p>{{this.content}}</p>
             {{/each}}
         </div>
+
+        {{!-- Like --}}
+        <div class="like-section">
+            <form action="/post/{{post.postid}}/like" method="POST" style="display: inline;">
+                <button type="submit" class="like-button">👍 Like</button>
+            </form>
+            <span class="like-count">{{post.likes}} Likes</span>
+        </div>
+
         
         <!-- Comments Section -->
         <div class="comments-section">
