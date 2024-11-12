@@ -36,6 +36,14 @@
         <!-- Comments Section -->
         <div class="comments-section">
             <h4>Comments</h4>
+            {{!-- TODO: Test after login --}}
+            {{!-- <div class="comment-input-section">
+                <form action="/post/{{post.postid}}/comment" method="POST">
+                    <input type="text" name="commentText" placeholder="Write a comment..." required class="comment-input">
+                    <button type="submit" class="comment-submit-btn">Post Comment</button>
+                </form>
+            </div> --}}
+
             {{#each comments}}
                 <div class="comment-box">
                     <p>
