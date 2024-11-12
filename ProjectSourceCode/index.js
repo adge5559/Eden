@@ -69,14 +69,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/discover', async(req, res) => {
-  const posts = await db.any(`
-    SELECT postid, title, titleimagepath
-    FROM posts
-    ORDER BY createtime DESC,
-    Limit 3
-  `); // TODO: Change the number after limit as needed
-
-  res.render('pages/discover', {posts});
+  res.render('pages/discover');
 });
 
 app.get('/welcome', (req, res) => {
@@ -249,6 +242,25 @@ app.get('/post/:id', async(req, res) => {
     res.render('pages/error', {message: 'Post not found'});
   }
 });
+
+app.post('/post/:id/comment', async(req, res) => {
+  const postId = req.params.id;
+  const commentText = req.body.commentText;
+  const commenterId = req.session.user.id;
+
+  try{
+    await db.none(
+      `INSERT INTO comments (postid, userid, commenttext, createtime) 
+      VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`
+      , [postId, commenterId, commentText]
+      );
+      res.redirect(`/post/${postId}`);
+  } catch (error) {
+      console.error('Error posting comment:', error);
+      res.redirect(`/post/${postId}`);
+  }
+});
+
 
 // Upload Page
 app.get('/upload', (req, res) => {
