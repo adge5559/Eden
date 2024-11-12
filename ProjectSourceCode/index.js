@@ -261,6 +261,21 @@ app.post('/post/:id/comment', async(req, res) => {
   }
 });
 
+app.post('/post/:id/like', async (req, res) => {
+  const postId = req.params.id;
+  try {
+    await db.none(
+        `UPDATE posts SET likes = likes + 1 
+        WHERE postid = $1`,
+        [postId]
+    );
+    res.redirect(`/post/${postId}`);
+  } catch (error) {
+    console.error('Error updating likes:', error);
+    res.redirect(`/post/${postId}`);
+  }
+});
+
 
 // Upload Page
 app.get('/upload', (req, res) => {
