@@ -10,7 +10,8 @@ const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 //allows images to be rendered
 app.use('/images', express.static(path.join(__dirname, 'images')));
-//
+// use resources folder
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
@@ -67,8 +68,15 @@ app.get('/', (req, res) => {
     res.render('pages/discover');
 });
 
-app.get('/discover', (req, res) => {
-  res.render('pages/discover');
+app.get('/discover', async(req, res) => {
+  const posts = await db.any(`
+    SELECT postid, title, titleimagepath
+    FROM posts
+    ORDER BY createtime DESC,
+    Limit 3
+  `); // TODO: Change the number after limit as needed
+
+  res.render('pages/discover', {posts});
 });
 
 app.get('/welcome', (req, res) => {
@@ -164,6 +172,85 @@ app.get('/profile', (req, res) => {
   } else{
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
   }
+});
 
+// Post page
+app.get('/post/:id', async(req, res) => {
+  const postId = req.params.id;
+  
+  try {
+    const post = await db.oneOrNone(
+      `SELECT * FROM posts 
+      WHERE postid = $1`, 
+      [postId]);
 
+    if (!post) {
+      return res.render('pages/error', {message: 'Post not found'});
+    }
+    
+    // Format create time of posts
+    post.formattedCreateTime = new Date(post.createtime).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Get user info of the post
+    const user = await db.oneOrNone(
+      `SELECT username, profilepicture FROM users 
+      WHERE username = $1`, 
+      [post.username]);
+
+    // Get comments of the post
+    const comments = await db.any(
+      `SELECT * FROM comments
+       WHERE postid = $1 
+       ORDER BY createtime`
+      , [postId]);
+    
+    // Format create time of comments
+    comments.forEach(comment => {
+      comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    });
+
+    // Get tags of the post
+    const tags = await db.any(`
+      SELECT tags.tagname 
+      FROM posttags 
+      JOIN tags ON posttags.tagid = tags.tagid 
+      WHERE posttags.postid = $1
+    `, [postId]);
+    
+    // Get sections of the post
+    const sections = await db.any(
+      `SELECT * FROM sections 
+      WHERE postid = $1 
+      ORDER BY createtime ASC`
+      , [postId]);
+    
+    // Render the post view with all the data
+    res.render('pages/post_page', {
+      post,
+      user,
+      comments,
+      tags,
+      sections
+    });
+  } catch (error) {
+    console.log(err);
+    res.render('pages/error', {message: 'Post not found'});
+  }
+});
+
+// Upload Page
+app.get('/upload', (req, res) => {
+  res.render('pages/upload');
 });
