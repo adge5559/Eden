@@ -1,6 +1,21 @@
+11/13/24
+- Past Week: - Register, Login, and Logout Pages are fully functional and connected to the 
+				User information database.
+			 - Basic Discover Page with set posts.
+			 - Basic Profile Page with some user information displayed.
+- Demo: Demoed our Register, Login, and Logout Pages. Able to make an account, where that 
+				data is then stored in the User information database. Using the database
+				user information is then verified when they attempt to login.
+- Next Week: Planning to work on the Discover and Profile Pages. The Discover should be
+				be able to display posts from users. The Profile Page should allow users
+				to make posts.
+
+
+
+
 11/8/24
 - Past Week:  set up docker, set up register page and connected it to the User Database
-- Demo: Demoed our Docker compose ability, as well as our homepage wit our NavBar
+- Demo: Demoed our Docker compose ability, as well as our homepage with our NavBar
 - Next Week: Planning to work on our Login and Register Page, making sure they are connected with out User Database
 
 
