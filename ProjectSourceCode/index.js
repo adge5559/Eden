@@ -110,8 +110,13 @@ app.post('/register', async (req, res) => {
 //login.hbs
 //login
 app.get('/login', (req, res) => {
-  
-  res.render('pages/login');
+  if (req.session.user) {
+    return res.render('pages/login', { 
+      message: 'You are already logged in. Would you like to log out?', 
+      showLoginForm:false
+    });
+  }
+  res.render('pages/login', {showLoginForm:true});
 
 });
 
