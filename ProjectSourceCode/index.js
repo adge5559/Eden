@@ -149,12 +149,18 @@ app.post('/login', async (req, res) => {
 
 //logout
 app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-      if (err) {
-          return res.status(500).send('Unable to log out');
-      }
-      res.render('pages/logout', { message: 'Logged out Successfully' }); 
-  });
+  if (!req.session.user) {  //check if user is logged in
+    //if not then say to go to the login page
+    return res.render('pages/logout', { message: 'You are not logged in. Please log in first.' });
+  }
+  else{
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Unable to log out');
+        }
+        res.render('pages/logout', { message: 'Logged out Successfully' }); 
+    });
+  }
 });
 
 //pathing to profile
