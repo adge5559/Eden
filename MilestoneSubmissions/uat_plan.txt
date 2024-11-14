@@ -1,0 +1,20 @@
+Register/login
+    - The tester will attempt to register an account with improper credentials and proper credentials. The user will then attempt to log in using both the wrong credentials and the correct ones.
+    - The test data will be a set of usernames and passwords that the tester will use to try to register/login. Some will be proper, while others will be incorrect (usernames already registered, missing passwords, etc).
+    - The test environment will be localhost.
+    - Attempts to register and log into accounts using improper credentials, while valid credentials for registering should be accepted, and they should work for logging in.
+    - The testers will be people that we know who are familiar with computers.
+
+Edit Profile Page
+    - The tester will attempt to change their bio, profile picture, and username. All of these features should work.
+    - The test data will be new usernames, pictures, and text for the bio.
+    - The test environment will be localhost.
+    - Attempting to change the picture, username, and bio should work. The system should not accept a new username which is already used by a different user, usernames which are too long, or bios which are too long.
+    - The testers will be people that we know who are familiar with computers.
+
+Creating posts/comments
+    - The tester will attempt to create posts with and without pictures, as well as leave comments on their and others posts
+    - The test data will be a couple preexisting posts as well as whatever the tester wants to write.
+    - The test environment will be localhost.
+    - Users should be able to create posts with any images or text provided that the text is not too long and the photos are in the correct format. Users should as well be able to write a comment on any post, provided that the comment's length is under the maximum.
+    - The testers will be people that we know who are familiar with computers.
