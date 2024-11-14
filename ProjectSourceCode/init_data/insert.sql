@@ -9,29 +9,29 @@ INSERT INTO users (username, password, profilepicture)
 VALUES ('new_user_2', '$2y$10$JtjNckhF.0hZB8I.7hp3rewPMHPkyS9oogaJTpvQA13kzBRvpK7Iq', '/images/ProfilePicture/new_user_2.jpg');
 
 
--- Insert Fern post
+-- Insert Post1
 INSERT INTO posts (postid, username, title, descriptions, titleimagepath, likes)
 VALUES (1, 'new_user_1', 'Fern', 
         'This fern thrives in humid conditions and is perfect for indoor environments.', 
         '/images/Post/1/titleimg.jpg', 0);
 
--- Insert Section 1 for the Fern post
+-- Insert Section 1 for Post1
 INSERT INTO sections (sectionid, sectiontitle, content, imgpath, postid)
 VALUES (1, 'Fern Care Tips', 
         'Keep the fern in a humid environment and water it regularly to ensure healthy growth.', 
         '/images/Post/1/section1.jpg', 1);
 
--- Insert Section 2 for the Fern post
+-- Insert Section 2 for Post1
 INSERT INTO sections (sectionid, sectiontitle, content, imgpath, postid)
 VALUES (2, 'Ideal Lighting for Ferns', 
         'Ferns thrive in indirect sunlight. Avoid placing them in direct sunlight, as it may damage the leaves.', 
         '/images/Post/1/section2.jpg', 1);
 
--- Insert Comment 1 for the Fern post
+-- Insert Comment 1 for Post1
 INSERT INTO comments (commentid, postid, username, commenttext)
 VALUES (1, 1, 'new_user_1', 'This is a beautiful fern! Thanks for sharing care tips.');
 
--- Insert Comment 2 for the Fern post
+-- Insert Comment 2 for Post1
 INSERT INTO comments (commentid, postid, username, commenttext)
 VALUES (2, 1, 'new_user_2', 'I love ferns too! Very helpful information.');
 
