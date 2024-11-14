@@ -1,6 +1,8 @@
+<!-- views/pages/home.hbs -->
 <div class="container">
   <h2>Welcome to Eden</h2>
 
+  <!-- Search Form -->
   <form action="/search" method="GET" class="mb-4">
     <div class="input-group">
       <input type="text" name="query" class="form-control" placeholder="Search for plants" aria-label="Search" aria-describedby="button-search" required>
@@ -8,6 +10,7 @@
     </div>
   </form>
 
+  <!-- Plant Cards -->
   <div class="row">
     {{#each plants}}
     <div class="col-md-4">
@@ -20,7 +23,7 @@
       </div>
     </div>
     {{else}}
-    <div class="col-md-4">
+    <div class="col-md-12">
       <p>No plants found.</p>
     </div>
     {{/each}}
