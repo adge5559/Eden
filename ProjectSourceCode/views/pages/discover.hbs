@@ -1,6 +1,10 @@
 <!-- views/pages/home.hbs -->
 <div class="container">
   <h2>Welcome to Eden</h2>
+  <form action="/search" method="GET">
+  <input type="text" name="query" placeholder="Search for plants" required>
+  <button type="submit">Search</button>
+</form>
   
   <!-- Hardcoded Box with plant image and description -->
   <div class="row">
