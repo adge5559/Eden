@@ -48,10 +48,3 @@ INSERT INTO posts (postid, username, title, descriptions, titleimagepath, likes)
 VALUES (3, 'new_user_2', 'Succulent', 
         'This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.', 
         '/images/Post/3/titleimg.jpg', 0);
-
-
-INSERT INTO plants (name, description, imagepath)
-VALUES
-    ('Fern', 'This fern thrives in humid conditions and is perfect for indoor environments.', '/images/fern.jpg'),
-    ('Cactus', 'A hardy plant that requires minimal care, great for dry climates and bright sunlight.', '/images/cactus.jpg'),
-    ('Succulent', 'This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.', '/images/succulent.jpg');
