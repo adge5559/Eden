@@ -1,3 +1,5 @@
+//docker compose down -v before running tests in order to clear the users database
+
 // ********************** Initialize server **********************************
 
 const server = require('../index'); //TODO: Make sure the path to your index.js is correctly added
