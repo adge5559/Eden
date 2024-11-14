@@ -261,7 +261,7 @@ app.post('/post/:id/comment', async(req, res) => {
   }
 });
 
-app.post('/post/:id/like', async (req, res) => {
+app.post('/post/:id/like', async(req, res) => {
   const postId = req.params.id;
   try {
     await db.none(
