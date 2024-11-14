@@ -64,11 +64,17 @@ app.use(
 
 //paths
 
-app.get('/', (req, res) => {
-    res.render('pages/discover');
+app.get('/', async (req, res) => {
+  try {
+    const plants = await db.any('SELECT * FROM plants');
+    res.render('pages/discover', { plants });
+  } catch (error) {
+    console.error('Error fetching plants:', error);
+    res.status(500).send('An error occurred while fetching plants.');
+  }
 });
 
-app.get('/discover', async(req, res) => {
+app.get('/discover', (req, res) => {
   res.render('pages/discover');
 });
 
@@ -291,4 +297,17 @@ app.post('/post/:id/like', async(req, res) => {
 // Upload Page
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
+});
+
+
+app.get('/search', async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    const plants = await db.any('SELECT * FROM plants WHERE name ILIKE $1', [`%${query}%`]);
+    res.render('pages/discover', { plants });
+  } catch (error) {
+    console.error('Error searching for plants:', error);
+    res.status(500).send('An error occurred while searching for plants.');
+  }
 });

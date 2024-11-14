@@ -1,41 +1,28 @@
-<!-- views/pages/home.hbs -->
 <div class="container">
   <h2>Welcome to Eden</h2>
-  <form action="/search" method="GET">
-  <input type="text" name="query" placeholder="Search for plants" required>
-  <button type="submit">Search</button>
-</form>
-  
-  <!-- Hardcoded Box with plant image and description -->
+
+  <form action="/search" method="GET" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="query" class="form-control" placeholder="Search for plants" aria-label="Search" aria-describedby="button-search" required>
+      <button class="btn btn-primary" type="submit" id="button-search">Search</button>
+    </div>
+  </form>
+
   <div class="row">
+    {{#each plants}}
     <div class="col-md-4">
       <div class="card mb-4">
-        <img src="/images/fern.jpg" class="card-img-top" alt="Plant Image" >
+        <img src="{{imagepath}}" class="card-img-top" alt="{{name}}" onerror="this.src='/images/default-plant.jpg'">
         <div class="card-body">
-          <h5 class="card-title">Fern</h5>
-          <p class="card-text">This fern thrives in humid conditions and is perfect for indoor environments.</p>
+          <h5 class="card-title">{{name}}</h5>
+          <p class="card-text">{{description}}</p>
         </div>
       </div>
     </div>
-
+    {{else}}
     <div class="col-md-4">
-      <div class="card mb-4">
-        <img src="/images/catus.jpg" class="card-img-top" alt="Plant Image" onerror="this.src='/images/default-plant.jpg'">
-        <div class="card-body">
-          <h5 class="card-title">Cactus</h5>
-          <p class="card-text">A hardy plant that requires minimal care, great for dry climates and bright sunlight.</p>
-        </div>
-      </div>
+      <p>No plants found.</p>
     </div>
-
-    <div class="col-md-4">
-      <div class="card mb-4">
-        <img src="/images/succulent.jpg" class="card-img-top" alt="Plant Image" onerror="this.src='/images/default-plant.jpg'">
-        <div class="card-body">
-          <h5 class="card-title">Succulent</h5>
-          <p class="card-text">This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.</p>
-        </div>
-      </div>
-    </div>
+    {{/each}}
   </div>
 </div>
