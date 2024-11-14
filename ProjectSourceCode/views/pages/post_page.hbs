@@ -34,6 +34,8 @@
             {{/each}}
         </div>
 
+        {{!-- TODO: Tags --}}
+
         {{!-- Like --}}
         <div class="like-section">
             <form action="/post/{{post.postid}}/like" method="POST" style="display: inline;">
@@ -42,7 +44,6 @@
             <span class="like-count">{{post.likes}} Likes</span>
         </div>
 
-        
         <!-- Comments Section -->
         <div class="comments-section">
             <h4>Comments</h4>
