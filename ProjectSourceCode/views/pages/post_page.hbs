@@ -38,22 +38,22 @@
 
         {{!-- Like --}}
         <div class="like-section">
-            <form action="/post/{{post.postid}}/like" method="POST" style="display: inline;">
-                <button type="submit" class="like-button">👍 Like</button>
-            </form>
-            <span class="like-count">{{post.likes}} Likes</span>
+            <button class="like-button" data-post-id="{{post.postid}}">👍 Like</button>
+            <span class="like-count" id="like-count-{{post.postid}}">{{post.likes}} Likes</span>
+
         </div>
 
         <!-- Comments Section -->
         <div class="comments-section">
             <h4>Comments</h4>
-            {{!-- TODO: Test after login --}}
+            {{!-- TODO: insert not working --}}
             {{!-- <div class="comment-input-section">
                 <form action="/post/{{post.postid}}/comment" method="POST">
                     <input type="text" name="commentText" placeholder="Write a comment..." required class="comment-input">
                     <button type="submit" class="comment-submit-btn">Post Comment</button>
                 </form>
             </div> --}}
+
 
             {{#each comments}}
                 <div class="comment-box">
@@ -73,3 +73,29 @@
 
 {{> message}}
 {{> footer}}
+
+
+{{!-- JS for Like Button --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const likeButton = document.querySelector('.like-button');
+        const postId = likeButton.getAttribute('data-post-id');
+        const likecount = document.getElementById(`like-count-${postId}`);
+        
+        likeButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(`/post/${postId}/like`, {method: 'POST'});
+                const result = await response.json();
+
+                if (response.ok) {
+                    likecount.textContent = `${result.likes} Likes`;
+                } else {
+                    console.error('Failed to like the post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+</script>
