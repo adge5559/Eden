@@ -187,10 +187,82 @@ app.get("/user/:username", async (req, res) => {
   const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', req.params.username);
   if (!userSearch) {
     res.render('pages/profileerr', { message: 'User not found.', error: true });
-  } else if(req.session.user && userSearch.username == req.session.user.username){
-    res.render('pages/user', {user: userSearch, isSelf: true});
   } else{
-    res.render('pages/user', {user: userSearch});
+    const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1`, [req.params.username]);
+    
+    let posts = []
+
+    for(const postIDObj of userPostIDs){
+      const postID = postIDObj.postid
+      try {
+        const post = await db.oneOrNone(
+          'SELECT * FROM posts WHERE postid = ' + postID);
+    
+        if (!post) {
+          return res.render('pages/error', {message: 'Error getting user posts'});
+        }
+        
+        // Format create time of posts
+        post.formattedCreateTime = new Date(post.createtime).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+    
+        // Get user info of the post
+        const user = await db.oneOrNone(
+          `SELECT username, profilepicture FROM users 
+          WHERE username = $1`, 
+          [post.username]);
+    
+        // Get comments of the post
+        const comments = await db.any(
+          `SELECT * FROM comments
+           WHERE postid = $1 
+           ORDER BY createtime`
+          , [postID]);
+        
+        // Format create time of comments
+        comments.forEach(comment => {
+          comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        });
+    
+        // Get tags of the post
+        const tags = await db.any(`
+          SELECT tags.tagname 
+          FROM posttags 
+          JOIN tags ON posttags.tagid = tags.tagid 
+          WHERE posttags.postid = $1
+        `, [postID]);
+        
+        // Get sections of the post
+        const sections = await db.any(
+          `SELECT * FROM sections 
+          WHERE postid = $1 
+          ORDER BY createtime ASC`
+          , [postID]);
+        
+        // Render the post view with all the data
+        posts.push({post, user, comments, tags, sections});
+      } catch (error) {
+        console.log(error);
+        res.render('pages/error', {message: 'An unexpected error has occurred'});
+      }
+    }
+    
+    if(req.session.user && userSearch.username == req.session.user.username){
+      res.render('pages/user', {user: userSearch, posts: posts, isSelf: true});
+    } else{
+      res.render('pages/user', {user: userSearch, posts: posts});
+    }
   }
 });
 
