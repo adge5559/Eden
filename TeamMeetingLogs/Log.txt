@@ -1,3 +1,14 @@
+11/19/24
+- Past Week: - Discover Page shows sample posts
+			 - Discover Page has search funcitonality to find specific posts
+			 - Can see sample posts with photos, descriptions, and likes/comments.
+			 - Profile Page shows basic user information.
+- Demo: Demoed our Discover Page and its ability to search up specific posts and their information, as well as our Profile page.
+- Next Week: - User should be able to make posts, which include photos and descriptions.
+			 - User can search up posts made by other users.
+			 - Profile Page has more specific user information.
+			 - Aesthetics
+
 11/13/24
 - Past Week: - Register, Login, and Logout Pages are fully functional and connected to the 
 				User information database.
