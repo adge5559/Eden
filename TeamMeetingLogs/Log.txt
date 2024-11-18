@@ -1,4 +1,4 @@
-11/19/24
+11/18/24
 - Past Week: - Discover Page shows sample posts
 			 - Discover Page has search funcitonality to find specific posts
 			 - Can see sample posts with photos, descriptions, and likes/comments.
