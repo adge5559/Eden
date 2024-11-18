@@ -64,13 +64,18 @@ app.use(
 
 //paths
 
-app.get('/', (req, res) => {
-    res.render('pages/discover');
-});
+async function getPlantsAndRender(res) {
+  try {
+      const plants = await db.any('SELECT * FROM plants');
+      res.render('pages/discover', { plants });
+  } catch (error) {
+      console.error('Error fetching plants:', error);
+      res.status(500).send('An error occurred while fetching plants.');
+  }
+}
 
-app.get('/discover', async(req, res) => {
-  res.render('pages/discover');
-});
+app.get('/', (req, res) => getPlantsAndRender(res));
+app.get('/discover', (req, res) => getPlantsAndRender(res));
 
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
@@ -265,25 +270,52 @@ app.get('/post/:id', async(req, res) => {
   }
 });
 
+
+// Comments
 app.post('/post/:id/comment', async(req, res) => {
+  // Make sure user is logged in
+  if (!req.session.user) {
+    return res.status(401).json({error: 'User not logged in'});
+  }
+
   const postId = req.params.id;
   const commentText = req.body.commentText;
-  const commenterId = req.session.user.id;
+  const username = req.session.user.username;
 
+  // Comment should not be empty
+  if (!commentText || commentText.trim() === '') {
+    return res.status(400).json({error: 'Comment text cannot be empty'});
+  }
+  
   try{
     await db.none(
-      `INSERT INTO comments (postid, userid, commenttext, createtime) 
-      VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`
-      , [postId, commenterId, commentText]
-      );
-      res.redirect(`/post/${postId}`);
+      `INSERT INTO comments (postid, username, commenttext, createtime) 
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`
+      , [postId, username, commentText]
+    );
+    
+
+    const newComment = {
+      username: username,
+      commenttext: commentText,
+      formattedCreateTime: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+
+    res.json(newComment);
   } catch (error) {
       console.error('Error posting comment:', error);
-      res.redirect(`/post/${postId}`);
+      res.status(500).json({error: 'An error occurred while posting the comment'});
   }
 });
 
-app.post('/post/:id/like', async (req, res) => {
+// Likes
+app.post('/post/:id/like', async(req, res) => {
   const postId = req.params.id;
   try {
     await db.none(
@@ -291,10 +323,16 @@ app.post('/post/:id/like', async (req, res) => {
         WHERE postid = $1`,
         [postId]
     );
-    res.redirect(`/post/${postId}`);
+
+    const updatedPost = await db.one(
+      `SELECT likes FROM posts 
+      WHERE postid = $1`
+      , [postId]);
+
+    res.json({likes: updatedPost.likes});
   } catch (error) {
     console.error('Error updating likes:', error);
-    res.redirect(`/post/${postId}`);
+    res.status(500).json({error: 'An error occurred while liking the post'});
   }
 });
 
@@ -302,4 +340,17 @@ app.post('/post/:id/like', async (req, res) => {
 // Upload Page
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
+});
+
+
+app.get('/search', async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    const plants = await db.any('SELECT * FROM plants WHERE name ILIKE $1', [`%${query}%`]);
+    res.render('pages/discover', { plants });
+  } catch (error) {
+    console.error('Error searching for plants:', error);
+    res.status(500).send('An error occurred while searching for plants.');
+  }
 });
