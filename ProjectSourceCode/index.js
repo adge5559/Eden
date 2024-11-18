@@ -252,7 +252,8 @@ app.get('/post/:id', async(req, res) => {
       user,
       comments,
       tags,
-      sections
+      sections,
+      is_logged_in: req.session.user
     });
   } catch (error) {
     console.log(err);
@@ -283,7 +284,6 @@ app.post('/post/:id/comment', async(req, res) => {
        VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`
       , [postId, username, commentText]
     );
-    
 
     const newComment = {
       username: username,
