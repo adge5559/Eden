@@ -13,7 +13,7 @@
             {{!-- Link to author's profile --}}
             <p>
                 Posted by: 
-                <a href="/profile/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
+                <a href="/user/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
                     <img src="{{user.profilepicture}}" alt="Profile Picture" class="profile-icon" style="width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; margin-right: 5px;">
                     <strong>{{user.username}}</strong>
                 </a>
@@ -59,7 +59,7 @@
                 {{#each comments}}
                     <div class="comment-box">
                         <p>
-                            <a href="/profile/{{this.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
+                            <a href="/user/{{this.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
                                 <strong>{{this.username}}</strong>
                             </a>
                             <small>{{this.formattedCreateTime}}</small>
@@ -129,7 +129,7 @@
                     newComment.className = 'comment-box';
                     newComment.innerHTML = `
                         <p>
-                            <a href="/profile/${result.username}" class="profile-link" style="text-decoration: none; color: inherit;">
+                            <a href="/user/${result.username}" class="profile-link" style="text-decoration: none; color: inherit;">
                                 <strong>${result.username}</strong>
                             </a>
                             <small>${result.formattedCreateTime}</small>

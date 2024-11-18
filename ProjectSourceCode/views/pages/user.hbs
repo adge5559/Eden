@@ -1,0 +1,89 @@
+{{> head}}
+{{> message}}
+<div class="container">
+    <div style="background-color: #eeeeee;">
+        {{#if isSelf}}
+            <a class="btn" href="/editprofile">Edit Profile</a>
+            <a class="btn" href="/upload">Create Post</a>
+        {{/if}}
+        <h1>{{user.username}}</h1>
+        <hr>
+        <h4>About</h4>
+        <p>No bio</p>
+        <h4>Posts</h4>
+        {{#each posts}}
+
+<div class="container">
+    <div class="post-image">
+        <img src="{{post.titleimagepath}}" alt="{{post.title}}" class="title-image" style="max-width: 100%; height: auto; max-height: 400px;">
+    </div>
+    <h2>{{post.title}}</h2>
+  
+  <!-- Hardcoded Box with plant image and description -->
+    <div class="post-container">
+        <!-- Other post details here -->
+        <div class="info-box">
+            {{!-- Link to author's profile --}}
+            <p>
+                Posted by: 
+                <a href="/user/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
+                    <img src="{{user.profilepicture}}" alt="Profile Picture" class="profile-icon" style="width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; margin-right: 5px;">
+                    <strong>{{user.username}}</strong>
+                </a>
+            </p>
+            <p>
+                Created on: 
+                <small>{{post.formattedCreateTime}}</small>
+            </p>
+        </div>
+
+        <div class="post-content">
+            {{#each sections}}
+                <h5>{{this.sectiontitle}}</h5>
+                <img src="{{this.imgpath}}" alt="{{this.sectiontitle}}" class="section-image" style="max-width: 100%; height: auto; max-height: 200px;">
+                <p>{{this.content}}</p>
+            {{/each}}
+        </div>
+
+        {{!-- TODO: Tags --}}
+
+        {{!-- Like --}}
+        <div class="like-section">
+            <button class="like-button" data-post-id="{{post.postid}}">👍 Like</button>
+            <span class="like-count" id="like-count-{{post.postid}}">{{post.likes}} Likes</span>
+
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h4>Comments</h4>
+            {{!-- TODO: insert not working --}}
+            <div class="comment-input-section">
+                <input type="text" id="comment-input" placeholder="Write a comment..." required class="comment-input">
+                <button id="comment-submit-btn" data-post-id="{{post.postid}}">Post Comment</button>
+            </div>
+
+            <div id="comments-list">
+                {{#each comments}}
+                    <div class="comment-box">
+                        <p>
+                            <a href="/user/{{this.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
+                                <strong>{{this.username}}</strong>
+                            </a>
+                            <small>{{this.formattedCreateTime}}</small>
+                        </p>
+                        <p class="comment-text">{{this.commenttext}}</p>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+        {{/each}}
+    </div>
+</div>
+{{> footer}}
+
