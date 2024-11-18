@@ -35,6 +35,17 @@ VALUES (1, 'new_user_1', 'This is a beautiful fern! Thanks for sharing care tips
 INSERT INTO comments (postid, username, commenttext)
 VALUES (1, 'new_user_2', 'I love ferns too! Very helpful information.');
 
+-- Insert tags to Post1
+INSERT INTO tags (tagid, tagname)
+VALUES 
+(1, 'Greens'),
+(2, 'Fern');
+
+-- Insert into posttags
+INSERT INTO posttags (postid, tagid)
+VALUES 
+(1, 1),
+(1, 2);
 
 -- Insert Cactus post
 INSERT INTO posts (username, title, descriptions, titleimagepath, likes)

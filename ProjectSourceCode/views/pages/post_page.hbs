@@ -10,7 +10,7 @@
     <div class="post-container">
         <!-- Other post details here -->
         <div class="info-box">
-            {{!-- Link to author's profile --}}
+            <!-- Link to author's profile -->
             <p>
                 Posted by: 
                 <a href="/user/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
@@ -32,8 +32,15 @@
             {{/each}}
         </div>
 
-        {{!-- TODO: Tags --}}
-        
+        {{!-- Tags --}}
+        <!-- TODO: Test after finish search -->
+        <div class="tags-section">
+            {{#each tags}}
+                <a href="/search?tag={{this.tagname}}" class="tag-button">
+                    {{this.tagname}}
+                </a>
+            {{/each}}
+        </div>
 
         {{!-- Like --}}
         <div class="like-section">
@@ -44,8 +51,8 @@
 
         <!-- Comments Section -->
         <div class="comments-section">
-            {{#if is_logged_in}}
-                <h4>Comments</h4>
+            <h4>Comments</h4>
+            {{#if is_logged_in}}   
                 <div class="comment-input-section">
                     <input type="text" id="comment-input" placeholder="Write a comment..." required class="comment-input">
                     <button id="comment-submit-btn" data-post-id="{{post.postid}}">Post Comment</button>
