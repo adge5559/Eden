@@ -260,24 +260,51 @@ app.get('/post/:id', async(req, res) => {
   }
 });
 
+
+// Comments
 app.post('/post/:id/comment', async(req, res) => {
+  // Make sure user is logged in
+  if (!req.session.user) {
+    return res.status(401).json({error: 'User not logged in'});
+  }
+
   const postId = req.params.id;
   const commentText = req.body.commentText;
-  const commenterId = req.session.user.id;
+  const username = req.session.user.username;
 
+  // Comment should not be empty
+  if (!commentText || commentText.trim() === '') {
+    return res.status(400).json({error: 'Comment text cannot be empty'});
+  }
+  
   try{
     await db.none(
-      `INSERT INTO comments (postid, userid, commenttext, createtime) 
-      VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`
-      , [postId, commenterId, commentText]
-      );
-      res.redirect(`/post/${postId}`);
+      `INSERT INTO comments (postid, username, commenttext, createtime) 
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`
+      , [postId, username, commentText]
+    );
+    
+
+    const newComment = {
+      username: username,
+      commenttext: commentText,
+      formattedCreateTime: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+
+    res.json(newComment);
   } catch (error) {
       console.error('Error posting comment:', error);
-      res.redirect(`/post/${postId}`);
+      res.status(500).json({error: 'An error occurred while posting the comment'});
   }
 });
 
+// Likes
 app.post('/post/:id/like', async(req, res) => {
   const postId = req.params.id;
   try {
@@ -286,10 +313,16 @@ app.post('/post/:id/like', async(req, res) => {
         WHERE postid = $1`,
         [postId]
     );
-    res.redirect(`/post/${postId}`);
+
+    const updatedPost = await db.one(
+      `SELECT likes FROM posts 
+      WHERE postid = $1`
+      , [postId]);
+
+    res.json({likes: updatedPost.likes});
   } catch (error) {
     console.error('Error updating likes:', error);
-    res.redirect(`/post/${postId}`);
+    res.status(500).json({error: 'An error occurred while liking the post'});
   }
 });
 

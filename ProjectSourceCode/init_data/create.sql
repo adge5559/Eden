@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Create posts table
 CREATE TABLE IF NOT EXISTS posts(
-	postid INT PRIMARY KEY,
+	postid SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     title VARCHAR(40) NOT NULL,
     descriptions TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS posts(
 
 -- Create sections table
 CREATE TABLE IF NOT EXISTS sections(
-	sectionid  INT PRIMARY KEY,
+	sectionid  SERIAL PRIMARY KEY,
     sectiontitle VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     imgpath VARCHAR(60),
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS posttags(
 
 -- Create comments table
 CREATE TABLE IF NOT EXISTS comments (
-    commentid INT PRIMARY KEY,
+    commentid SERIAL PRIMARY KEY,
     postid INT,
     username VARCHAR(255) NOT NULL,
     commenttext TEXT,
