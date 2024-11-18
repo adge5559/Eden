@@ -9,7 +9,7 @@
     display: inline-block;
     line-height: 0.3;
 }
-
+/* Comment */
 .comment-box {
     background-color: #e9e9e9;
     border: 1px solid #e9e9e9;
@@ -22,6 +22,40 @@
     margin-left: 15px;
 }
 
+/* Tag */
+.tag-button {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #00d0ff;
+    background-color: #ebebeb;
+    border: 1px solid #ebebeb;
+    border-radius: 15px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.tag-button:hover {
+    background-color: #63aeff; /* Blue background */
+    color: white; /* White text */
+}
+
+/* Add space between tags, like, and comments */
+.tags-section {
+    margin-bottom: 20px;
+}
+
+.like-section {
+    margin-bottom: 20px;
+}
+
+.comments-section {
+    margin-top: 20px;
+}
+
+
+/* Navbar */
 .btn-navbar-green {
     background-color: #9DC183;
     border-color: #9DC183;
@@ -33,3 +67,4 @@
     border-color: #9DC183;
     color: #9DC183;
 }
+
