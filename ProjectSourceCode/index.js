@@ -64,19 +64,18 @@ app.use(
 
 //paths
 
-app.get('/', async (req, res) => {
+async function getPlantsAndRender(res) {
   try {
-    const plants = await db.any('SELECT * FROM plants');
-    res.render('pages/discover', { plants });
+      const plants = await db.any('SELECT * FROM plants');
+      res.render('pages/discover', { plants });
   } catch (error) {
-    console.error('Error fetching plants:', error);
-    res.status(500).send('An error occurred while fetching plants.');
+      console.error('Error fetching plants:', error);
+      res.status(500).send('An error occurred while fetching plants.');
   }
-});
+}
 
-app.get('/discover', (req, res) => {
-  res.render('pages/discover');
-});
+app.get('/', (req, res) => getPlantsAndRender(res));
+app.get('/discover', (req, res) => getPlantsAndRender(res));
 
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
