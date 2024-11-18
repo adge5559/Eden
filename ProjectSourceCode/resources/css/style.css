@@ -21,3 +21,15 @@
 .comment-box p.comment-text {
     margin-left: 15px;
 }
+
+.btn-navbar-green {
+    background-color: #9DC183;
+    border-color: #9DC183;
+    color: white;
+}
+
+.btn-navbar-green:hover {
+    background-color: white;
+    border-color: #9DC183;
+    color: #9DC183;
+}

@@ -64,11 +64,17 @@ app.use(
 
 //paths
 
-app.get('/', (req, res) => {
-    res.render('pages/discover');
+app.get('/', async (req, res) => {
+  try {
+    const plants = await db.any('SELECT * FROM plants');
+    res.render('pages/discover', { plants });
+  } catch (error) {
+    console.error('Error fetching plants:', error);
+    res.status(500).send('An error occurred while fetching plants.');
+  }
 });
 
-app.get('/discover', async(req, res) => {
+app.get('/discover', (req, res) => {
   res.render('pages/discover');
 });
 
@@ -110,8 +116,13 @@ app.post('/register', async (req, res) => {
 //login.hbs
 //login
 app.get('/login', (req, res) => {
-  
-  res.render('pages/login');
+  if (req.session.user) {
+    return res.render('pages/login', { 
+      message: 'You are already logged in. Would you like to log out?', 
+      showLoginForm:false
+    });
+  }
+  res.render('pages/login', {showLoginForm:true});
 
 });
 
@@ -149,12 +160,18 @@ app.post('/login', async (req, res) => {
 
 //logout
 app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-      if (err) {
-          return res.status(500).send('Unable to log out');
-      }
-      res.render('pages/logout', { message: 'Logged out Successfully' }); 
-  });
+  if (!req.session.user) {  //check if user is logged in
+    //if not then say to go to the login page
+    return res.render('pages/logout', { message: 'You are not logged in. Please log in first.' });
+  }
+  else{
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Unable to log out');
+        }
+        res.render('pages/logout', { message: 'Logged out Successfully' }); 
+    });
+  }
 });
 
 //pathing to profile
@@ -313,4 +330,17 @@ app.post('/post/:id/like', async(req, res) => {
 // Upload Page
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
+});
+
+
+app.get('/search', async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    const plants = await db.any('SELECT * FROM plants WHERE name ILIKE $1', [`%${query}%`]);
+    res.render('pages/discover', { plants });
+  } catch (error) {
+    console.error('Error searching for plants:', error);
+    res.status(500).send('An error occurred while searching for plants.');
+  }
 });
