@@ -170,11 +170,22 @@ app.get('/logout', (req, res) => {
 
 //pathing to profile
 app.get('/profile', (req, res) => {
-  const bruh = req.session.user?.username
+  const bruh = req.session.user?.username;
   if(bruh){
-    res.render('pages/profile', {error: true, user: req.session.user});
+    res.redirect('/user/' + req.session.user.username);
   } else{
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+});
+
+app.get("/user/:username", async (req, res) => {
+  const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', req.params.username);
+  if (!userSearch) {
+    res.render('pages/profileerr', { message: 'User not found.', error: true });
+  } else if(req.session.user && userSearch.username == req.session.user.username){
+    res.render('pages/user', {user: userSearch, isSelf: true});
+  } else{
+    res.render('pages/user', {user: userSearch});
   }
 });
 

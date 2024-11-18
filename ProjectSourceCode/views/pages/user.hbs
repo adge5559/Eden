@@ -2,6 +2,9 @@
 {{> message}}
 <div class="container">
     <div style="background-color: #eeeeee;">
+        {{#if isSelf}}
+            <a class="btn" href="/editprofile">Edit Profile</a>
+        {{/if}}
         <h1>{{user.username}}</h1>
         <hr>
         <h4>About</h4>
