@@ -24,11 +24,11 @@ Application Description
     to be the ultimate go-to space for personalized plant care, community feedback, 
     and continuous learning in the world of gardening.
 
-Contributors
-    Ella Larson
-    Addison Getz
-    Gavin Walker
-    Leonard Huang
+Contributors:
+    Ella Larson,
+    Addison Getz,
+    Gavin Walker,
+    Leonard Huang,
     Alexander Carmichael
 
 Technology Stack: ?
