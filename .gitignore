@@ -5,4 +5,5 @@ package-lock.json
 .env.swp
 
 # Temp folder
-\temp
+*\temp
+*\uploads
