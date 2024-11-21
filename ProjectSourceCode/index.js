@@ -67,10 +67,15 @@ app.use(
 
 
 app.get('/', (req, res) => {res.redirect('/discover');});
+<<<<<<< HEAD
 app.get('/discover', async (req, res) => {
   try {
     // Fetch all posts from the database
     const posts = await db.query('SELECT postid, title, titleimagepath, descriptions FROM posts'); // Adjust query as needed
+=======
+
+app.get('/discover', (req, res) => getPlantsAndRender(res));
+>>>>>>> a39e45d (making the posts not ugly)
 
     // Render the page and pass the posts data
     res.render('pages/discover', { posts });
@@ -329,11 +334,16 @@ app.get('/post/:id', async(req, res) => {
       WHERE postid = $1 
       ORDER BY createtime ASC`
       , [postId]);
-    
+
+    const descriptions = await db.any(
+    `SELECT descriptions FROM posts 
+      WHERE postid = $1`
+      , [postId]);
       //console.log('Comments fetched:', comments);
     // Render the post view with all the data
     res.render('pages/post_page', {
       post,
+      descriptions,
       user,
       comments,
       tags,
