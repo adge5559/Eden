@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS sections(
 
 -- Create tags table
 CREATE TABLE IF NOT EXISTS tags(
-	tagid INT PRIMARY KEY,
+	tagid SERIAL PRIMARY KEY,
     tagname VARCHAR(50) UNIQUE
 );
 
