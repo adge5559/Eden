@@ -1,0 +1,19 @@
+Week 1 Meeting: Decieded what each team member will be in charge of for the beginning of the project. This can be seen in the Project Board.
+General:  Ella - login and logout, partials
+          Addison - NavBar, Registration
+          Gavin - Discovery/home page
+          Leonard - Databases
+          Alex - Profile Page and uploading posts.
+
+Week 2 Meeting: Went over how to use the Docker, including our .env. Went over the register page together. Planning to working on Login and 
+Logout, as well as some Register, to ensure they are connected with our User Database.
+
+Week 3 Meeting: Discussed specifics on the Discover page and how users will be presented with posts, as well as how they can search for them. 
+Login, Logout, and Register pages are fully functional and able to use. Discover page is showing a basic set of posts, hoping to be able to 
+link them to the actual posts soon. Profile page is very simple, planning to add more detail this coming week. Going to work on how to upload 
+posts this week as well. 
+
+Week 4 Meeting: Disover page has search functionality, so you can find different posts. Can see sample posts with photos, descriptions, comments, 
+and likes. Users can also add likes and comments. Need to work on a more overall look for the website, so it looks more put together. Especially 
+need to work on users profiles as well as how to make posts. This is important because we can't really see how well the post display on the 
+discover page works, as well as post pages, without some variation (tests).

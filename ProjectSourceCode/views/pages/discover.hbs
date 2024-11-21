@@ -1,25 +1,28 @@
-<!-- views/pages/home.hbs -->
 <div class="container text-center">
-    <h2 style="color: green; text-align: center; font-weight: bold; margin-bottom: 20px;">Welcome to Eden</h2>
-
   <!-- Search Form -->
- <form action="/search" method="GET" class="mb-4">
-  <div class="input-group">
-    <input type="text" name="query" class="form-control" placeholder="Search for plants" aria-label="Search" aria-describedby="button-search" required>
-    <button class="btn btn-success" type="submit" id="button-search">Search</button>
-  </div>
+<form action="/search" method="GET" class="mb-4" style="margin-top: 20px;">
+<div class="input-group">
+<input type="text" name="query" class="form-control" placeholder="Search for posts" aria-label="Search" aria-describedby="button-search" required>
+<button class="btn" type="submit" id="button-search" style="background-color: #0b680f; color: white;">Search</button>
+</div>
 </form>
+
+
 
   <!-- Plant Cards -->
   <div class="row">
-    {{#each plants}}
+    {{#each posts}}
     <div class="col-md-4">
       <div class="card mb-4">
-        <img src="{{imagepath}}" class="card-img-top" alt="{{name}}" onerror="this.src='/images/default-plant.jpg'">
+        <a href="/post/{{postid}}" class="text-decoration-none text-dark">
+       <div class="card-header" style="background-color:#9DC183; color: white;">
+        <h4 class="card-title" style="margin: 0;">{{title}}</h4>
+      </div>
+        <img src="{{titleimagepath}}" class="card-img-top" alt="{{title}}" onerror="this.src='/images/default-plant.jpg'">
         <div class="card-body">
-          <h5 class="card-title">{{name}}</h5>
-          <p class="card-text">{{description}}</p>
+          <p class="card-text">{{descriptions}}</p>
         </div>
+        </a>
       </div>
     </div>
     {{else}}

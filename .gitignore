@@ -3,6 +3,7 @@ package-lock.json
 .env
 .DS_Store
 .env.swp
+init_db.sh
 
 # Temp folder
 *\temp

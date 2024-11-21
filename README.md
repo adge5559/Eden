@@ -1,4 +1,6 @@
-# Eden
+# Eden 
+Application Description
+
     Eden is a social media platform created for plant lovers who want to share 
     their passion for plant care. This platform allows users to login to their 
     accounts and post photos of the plants they are caring for, along with tips 
@@ -21,3 +23,16 @@
     to connect with others who share a love for plants. The platform is designed 
     to be the ultimate go-to space for personalized plant care, community feedback, 
     and continuous learning in the world of gardening.
+
+Contributors:
+    Ella Larson,
+    Addison Getz,
+    Gavin Walker,
+    Leonard Huang,
+    Alexander Carmichael
+
+Technology Stack: ?
+
+How To Run Tests: ?
+
+Link to Deployed Application: ?
