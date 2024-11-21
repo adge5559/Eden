@@ -431,12 +431,11 @@ app.get('/upload', (req, res) => {
 
 app.get('/search', async (req, res) => {
   const { query } = req.query;
-
   try {
-    const plants = await db.any('SELECT * FROM plants WHERE name ILIKE $1', [`%${query}%`]);
-    res.render('pages/discover', { plants });
+    const posts = await db.any('SELECT * FROM posts WHERE title ILIKE $1 OR descriptions ILIKE $2', [`%${query}%`, `%${query}%`]);
+    res.render('pages/discover', { posts });
   } catch (error) {
-    console.error('Error searching for plants:', error);
-    res.status(500).send('An error occurred while searching for plants.');
+    console.error('Error searching for posts:', error);
+    res.status(500).send('An error occurred while searching for posts.');
   }
-});
+ });
