@@ -1,5 +1,6 @@
 # Eden 
 Application Description
+
     Eden is a social media platform created for plant lovers who want to share 
     their passion for plant care. This platform allows users to login to their 
     accounts and post photos of the plants they are caring for, along with tips 
