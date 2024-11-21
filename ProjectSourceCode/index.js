@@ -74,7 +74,7 @@ async function getPlantsAndRender(res) {
   }
 }
 
-app.get('/', (req, res) => getPlantsAndRender(res));
+app.get('/', (req, res) => {res.redirect('/discover');});
 app.get('/discover', (req, res) => getPlantsAndRender(res));
 
 app.get('/welcome', (req, res) => {
