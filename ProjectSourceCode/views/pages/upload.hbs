@@ -1,13 +1,135 @@
-{{> head}}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Create a New Post</h1>
+        <button type="submit" form="new-post-form" class="btn btn-primary post-btn">Post</button>
+    </div>
 
-{{!-- TODO: --}}
-{{!-- Limit number of new sections to 10 --}}
-{{!-- Get the new PostID --}}
-{{!-- User input: Title, descriptions, and titleimg. --}}
-{{!-- Save uploaded TitleImg to imgages/Post/{PostID} --}}
-{{!-- Add sections --}}
-{{!-- Save the img of each section rename them from 1 to n, where n < 10, to imgages/Post/{PostID} --}}
+    <form id="new-post-form" action="/create-post" method="POST" enctype="multipart/form-data">
+        <!-- Title -->
+        <div class="form-group">
+            <label for="post-title">Post Title:<span class="required">*</span></label>
+            <input type="text" name="title" placeholder="Enter title (REQUIRED)" style="width: 300px;" required>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label for="post-description">Description:<span class="required">*</span></label>
+            <textarea id="post-description" name="descriptions" class="form-control" required maxlength="2000" placeholder="Enter post description"></textarea>
+        </div>
+
+        <!-- Title Image Upload -->
+        <div class="form-group">
+            <label for="title-image">Title Image<span class="required">*</span></label>
+            <div>
+                <input type="file" id="title-image" name="titleimg" class="form-control-file" accept="image/*" required>
+            </div>
+        </div>
+            
+        <!-- Tags -->
+        <div id="tags-container" class="mt-4">
+            <label for="tag-1">Tags:(At Least 1)<span class="required">*</span></label>
+            <button type="button" id="add-tag-btn">Add Tag</button>
+
+            <!-- Tags Input -->
+            <div class="tag-box d-flex align-items-center mb-2">
+                <input type="text" name="tags[]" class="form-control tag-input" placeholder="Enter your tag" required>
+            </div>
+
+            <!-- Addition Tags -->
+            <div id="additional-tags"></div>
+        </div>
+
+        <!-- Sections -->
+        <div id="sections-container">
+            <h2>Sections (Max 10)</h2>
+            <p>You can add up to 10 sections. For each section, a title, content are required</p>
+
+            <!-- Initial Section -->
+            <div class="section-box">
+                <hr>
+                <h3>Section <span class="section-number">1</span><span class="required">*</span></h3>
+                <div class="form-group">
+                    <label for="section-title-1">Section Title:<span class="required">*</span></label>
+                    <input type="text" id="section-title-1" name="sectiontitle[]" class="form-control" maxlength="255" placeholder="Enter section title" required>
+                </div>
+                <div class="form-group">
+                    <label for="section-content-1">Section Content:<span class="required">*</span></label>
+                    <textarea id="section-content-1" name="content[]" class="form-control" maxlength="2000" placeholder="Enter section content" requried></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="section-image-1">Section Image</label>
+                    <input type="file" id="section-image-1" name="imgpath[]" class="form-control-file" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Section Button -->
+        <button type="button" id="add-section-btn" class="btn btn-secondary">Add Section</button>
+    </form>
+</div>
 
 
-{{> message}}
-{{> footer}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const maxSections = 10; // Maximum sections
+        const maxTags = 5; // Maximum tags
+        let sectionCount = 1; // Initial section count
+        let tagCount = 1; // Initial tag count
+
+        const sectionsContainer = document.getElementById('sections-container');
+        const addSectionBtn = document.getElementById('add-section-btn');
+
+        const tagsContainer = document.getElementById('tags-container');
+        const addTagBtn = document.getElementById('add-tag-btn');
+
+        // Add new section
+        addSectionBtn.addEventListener('click', function () {
+            if (sectionCount >= maxSections) {
+                alert(`You can only add up to ${maxSections} sections.`);
+                return;
+            }
+
+            sectionCount++;
+
+            // Create a new section
+            const newSection = document.createElement('div');
+            newSection.className = 'section-box';
+            newSection.innerHTML = `
+                <hr>
+                <h3>Section <span class="section-number">${sectionCount}</span></h3>
+                <div class="form-group">
+                    <label for="section-title-${sectionCount}">Section Title<span class="required">*</span></label>
+                    <input type="text" id="section-title-${sectionCount}" name="sectiontitle[]" class="form-control" maxlength="255" placeholder="Enter section title" required>
+                </div>
+                <div class="form-group">
+                    <label for="section-content-${sectionCount}">Section Content<span class="required">*</span></label>
+                    <textarea id="section-content-${sectionCount}" name="content[]" class="form-control" maxlength="2000" placeholder="Enter section content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="section-image-${sectionCount}">Section Image</label>
+                    <input type="file" id="section-image-${sectionCount}" name="imgpath[]" class="form-control-file" accept="image/*">
+                </div>
+            `;
+            sectionsContainer.appendChild(newSection);
+        });
+
+        // Add new tag
+        addTagBtn.addEventListener('click', function () {
+            if (tagCount >= maxTags) {
+                alert(`You can only add up to ${maxTags} tags.`);
+                return;
+            }
+
+            tagCount++;
+
+            // Create a new tag
+            const newTag = document.createElement('div');
+            newTag.className = 'tag-box';
+            newTag.innerHTML = `
+                <div class="tag-box d-flex align-items-center mb-2">
+                    <input type="text" name="tags[]" id="tag-${tagCount}" class="form-control tag-input" placeholder="Enter your tag" required>
+                </div>`;
+            tagsContainer.appendChild(newTag);
+        });
+    });
+</script>

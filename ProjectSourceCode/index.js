@@ -8,6 +8,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const fs = require("fs");
+const {IncomingForm} = require('formidable');
 //allows images to be rendered
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // use resources folder
@@ -330,6 +332,122 @@ app.post('/post/:id/like', async(req, res) => {
 // Upload Page
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
+});
+
+
+// Save posts
+app.post('/create-post', async (req, res) => {
+  const form = new IncomingForm();
+  form.uploadDir = path.join(__dirname, 'images/uploads');
+  form.keepExtensions = true;
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Error parsing form:', err);
+      return res.status(500).send('An error occurred while uploading the files.');
+    }
+
+    console.log('Fields:', fields);
+    console.log('Files:', files);
+
+    try {
+      const { title, descriptions, sectiontitle, content } = fields;
+      const tags = Array.isArray(fields['tags[]']) ? fields['tags[]'] : [fields['tags[]']]; // Ensure tags are always an array
+
+      // Insert post
+      const post = await db.one(
+        `INSERT INTO posts (username, title, descriptions, titleimagepath, createtime)
+         VALUES ($1, $2, $3, '', CURRENT_TIMESTAMP)
+         RETURNING postid`,
+        [req.session.user.username, title, descriptions]
+      );
+      const postId = post.postid;
+
+      // Save title image
+      const postDir = path.join(__dirname, `images/Post/${postId}`);
+      if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
+
+      if (files.titleimg && files.titleimg.filepath) {
+        const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
+        fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
+
+        // Update the database
+        await db.none(
+          `UPDATE posts SET titleimagepath = $1 WHERE postid = $2`,
+          [titleImgPath, postId]
+        );
+      }
+
+      // Insert tags
+      for (const tagName of tags) {
+        const tag = await db.oneOrNone(
+          `INSERT INTO tags (tagname) VALUES ($1) 
+           ON CONFLICT (tagname) DO NOTHING 
+           RETURNING tagid`,
+          [tagName]
+        );
+
+        const tagId = tag
+          ? tag.tagid
+          : (
+              await db.one(`SELECT tagid FROM tags WHERE tagname = $1`, [tagName])
+            ).tagid;
+
+        await db.none(
+          `INSERT INTO posttags (postid, tagid) VALUES ($1, $2)`,
+          [postId, tagId]
+        );
+      }
+
+      // Insert sections
+      // Process sections
+      if (fields['sectiontitle[]'] && fields['content[]']) {
+        const sectionTitles = Array.isArray(fields['sectiontitle[]'])
+          ? fields['sectiontitle[]']
+          : [fields['sectiontitle[]']].filter(Boolean); // Normalize and filter empty
+        const sectionContents = Array.isArray(fields['content[]'])
+          ? fields['content[]']
+          : [fields['content[]']].filter(Boolean); // Normalize and filter empty
+
+        const sectionImages = files['imgpath[]']
+          ? Array.isArray(files['imgpath[]'])
+            ? files['imgpath[]']
+            : [files['imgpath[]']]
+          : [];
+
+        for (let i = 0; i < sectionTitles.length; i++) {
+          if (!sectionTitles[i] || !sectionContents[i]) {
+            console.error(`Skipping section ${i + 1} due to missing title or content.`);
+            continue; // Skip invalid sections
+          }
+
+          const sectionImagePath =
+            sectionImages[i] && sectionImages[i].filepath
+              ? `/images/Post/${postId}/section${i + 1}.jpg`
+              : null;
+
+          if (sectionImages[i] && sectionImages[i].filepath) {
+            fs.renameSync(
+              sectionImages[i].filepath,
+              path.join(postDir, `section${i + 1}.jpg`)
+            );
+          }
+
+          await db.none(
+            `INSERT INTO sections (postid, sectiontitle, content, imgpath, createtime)
+            VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+            [postId, sectionTitles[i], sectionContents[i], sectionImagePath]
+          );
+        }
+      }
+
+
+      res.redirect(`/post/${postId}`);
+    } catch (error) {
+      console.error('Error creating post:', error);
+      res.status(500).send('An error occurred while creating the post.');
+    }
+  });
 });
 
 
