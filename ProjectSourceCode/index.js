@@ -301,7 +301,7 @@ app.get('/post/:id', async(req, res) => {
        WHERE postid = $1 
        ORDER BY createtime`
       , [postId]);
-    
+      console.log('Comments fetched:', comments);
     // Format create time of comments
     comments.forEach(comment => {
       comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
@@ -328,6 +328,7 @@ app.get('/post/:id', async(req, res) => {
       ORDER BY createtime ASC`
       , [postId]);
     
+      //console.log('Comments fetched:', comments);
     // Render the post view with all the data
     res.render('pages/post_page', {
       post,
@@ -345,13 +346,13 @@ app.get('/post/:id', async(req, res) => {
 
 
 // Comments
-app.post('/post/:id/comment', async(req, res) => {
+app.post('/post/:postid/comment', async(req, res) => {
   // Make sure user is logged in
   if (!req.session.user) {
     return res.status(401).json({error: 'User not logged in'});
   }
 
-  const postId = req.params.id;
+  const postId = req.params.postid;
   const commentText = req.body.commentText;
   const username = req.session.user.username;
 
@@ -368,6 +369,7 @@ app.post('/post/:id/comment', async(req, res) => {
     );
 
     const newComment = {
+      postid: postId,
       username: username,
       commenttext: commentText,
       formattedCreateTime: new Date().toLocaleDateString('en-US', {
@@ -385,6 +387,7 @@ app.post('/post/:id/comment', async(req, res) => {
       res.status(500).json({error: 'An error occurred while posting the comment'});
   }
 });
+
 
 // Likes
 app.post('/post/:id/like', async(req, res) => {
@@ -407,6 +410,9 @@ app.post('/post/:id/like', async(req, res) => {
     res.status(500).json({error: 'An error occurred while liking the post'});
   }
 });
+
+
+
 
 
 // Upload Page
