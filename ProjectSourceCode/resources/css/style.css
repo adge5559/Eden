@@ -67,3 +67,41 @@
     border-color: #9DC183;
     color: #9DC183;
 }
+
+
+/* Upload */
+.required {
+    color: red;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.tag-input {
+    width: 130px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-top: 1px;
+}
+
+.tag-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#add-tag-btn {
+    height: 38px;
+    margin-left: 10px;
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+.post-btn {
+    font-size: 1.5rem; /* Increase font size */
+    padding: 15px 30px; /* Adjust padding */
+    border-radius: 8px; /* Slightly rounded corners */
+}

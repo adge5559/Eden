@@ -1,4 +1,3 @@
-{{> head}}
 
 <div class="container">
     <div class="post-image">
@@ -25,6 +24,10 @@
         </div>
 
         <div class="post-content">
+            <p>
+                <h5>Description:</h5>
+                {{post.descriptions}}
+            </p>
             {{#each sections}}
                 <h5>{{this.sectiontitle}}</h5>
                 <img src="{{this.imgpath}}" alt="{{this.sectiontitle}}" class="section-image" style="max-width: 100%; height: auto; max-height: 200px;">
@@ -78,10 +81,6 @@
         </div>
     </div>
 </div>
-
-
-{{> message}}
-{{> footer}}
 
 
 {{!-- JS for Like Button --}}
