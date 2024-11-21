@@ -12,14 +12,16 @@
 
   <!-- Plant Cards -->
   <div class="row">
-    {{#each plants}}
+    {{#each posts}}
     <div class="col-md-4">
       <div class="card mb-4">
-        <img src="{{imagepath}}" class="card-img-top" alt="{{name}}" onerror="this.src='/images/default-plant.jpg'">
+        <a href="/post/{{postid}}" class="text-decoration-none text-dark">
+        <img src="{{titleimagepath}}" class="card-img-top" alt="{{title}}" onerror="this.src='/images/default-plant.jpg'">
         <div class="card-body">
-          <h5 class="card-title">{{name}}</h5>
+          <h5 class="card-title">{{title}}</h5>
           <p class="card-text">{{description}}</p>
         </div>
+        </a>
       </div>
     </div>
     {{else}}

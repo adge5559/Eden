@@ -64,19 +64,21 @@ app.use(
 
 //paths
 
-async function getPlantsAndRender(res) {
-  try {
-      const plants = await db.any('SELECT * FROM plants');
-      res.render('pages/discover', { plants });
-  } catch (error) {
-      console.error('Error fetching plants:', error);
-      res.status(500).send('An error occurred while fetching plants.');
-  }
-}
+
 
 app.get('/', (req, res) => {res.redirect('/discover');});
-app.get('/discover', (req, res) => getPlantsAndRender(res));
+app.get('/discover', async (req, res) => {
+  try {
+    // Fetch all posts from the database
+    const posts = await db.query('SELECT postid, title, titleimagepath FROM posts'); // Adjust query as needed
 
+    // Render the page and pass the posts data
+    res.render('pages/discover', { posts });
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).send('An error occurred while fetching posts.');
+  }
+});
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
