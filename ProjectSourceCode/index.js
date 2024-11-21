@@ -450,14 +450,21 @@ app.get('/upload', (req, res) => {
 
 //Search Page
 app.get('/search', async (req, res) => {
-  const { query } = req.query; //this is what the user searched for
+  const { query } = req.query;
   try {
-    //search the posts database for any posts where the title or description have this query
-    //query does not have to match title or description exactly, the ILIKE and % make it so there is partial and case-insensitive matching
-    const posts = await db.any('SELECT * FROM posts WHERE title ILIKE $1 OR descriptions ILIKE $2', [`%${query}%`, `%${query}%`]);
-    res.render('pages/discover', { posts }); //show the found posts
-  } catch (error) {//error
+    const posts = await db.any(`
+      SELECT DISTINCT p.* 
+      FROM posts p
+      LEFT JOIN posttags pt ON p.postid = pt.postid
+      LEFT JOIN tags t ON pt.tagid = t.tagid
+      WHERE p.title ILIKE $1 
+         OR p.descriptions ILIKE $2
+         OR t.tagname ILIKE $3
+    `, [`%${query}%`, `%${query}%`, `%${query}%`]);
+    
+    res.render('pages/discover', { posts });
+  } catch (error) {
     console.error('Error searching for posts:', error);
     res.status(500).send('An error occurred while searching for posts.');
   }
- });
+});
