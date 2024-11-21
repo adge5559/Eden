@@ -39,10 +39,10 @@ INSERT INTO comments (postid, username, commenttext)
 VALUES (1, 'new_user_2', 'I love ferns too! Very helpful information.');
 
 -- Insert tags to Post1
-INSERT INTO tags (tagid, tagname)
+INSERT INTO tags (tagname)
 VALUES 
-(1, 'Greens'),
-(2, 'Fern');
+('Greens'),
+('Fern');
 
 -- Insert into posttags
 INSERT INTO posttags (postid, tagid)
