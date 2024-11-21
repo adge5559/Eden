@@ -67,15 +67,10 @@ app.use(
 
 
 app.get('/', (req, res) => {res.redirect('/discover');});
-<<<<<<< HEAD
 app.get('/discover', async (req, res) => {
   try {
     // Fetch all posts from the database
     const posts = await db.query('SELECT postid, title, titleimagepath, descriptions FROM posts'); // Adjust query as needed
-=======
-
-app.get('/discover', (req, res) => getPlantsAndRender(res));
->>>>>>> a39e45d (making the posts not ugly)
 
     // Render the page and pass the posts data
     res.render('pages/discover', { posts });
