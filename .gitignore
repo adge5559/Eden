@@ -6,4 +6,5 @@ package-lock.json
 init_db.sh
 
 # Temp folder
-\temp
+*\temp
+*\uploads
