@@ -1,0 +1,23 @@
+{{> head}}
+<h1>Edit Profile</h1>
+<h3>Username</h3>
+{{> message}}
+<p>{{user.username}} - Cannot be changed</p>
+<form action="/editprofile" method="POST">
+    <div class="form-group">
+    <label for="bio" class="form-label">About me</label>
+    <input type="text" name="bio" id="bio" class="form-control" value={{user.bio}}>
+    </div>
+    <br> 
+    <div class="form-group">
+    <select name="profilepicture" id="profilepicture" size="5">
+        <option>Picture 1</option>
+        <option>Picture 2</option>
+        <option>Picture 3</option>
+        <option>Picture 4</option>
+        <option>Picture 5</option>
+    </select>
+    </div>
+    <br> 
+    <button type="submit" class="btn btn-navbar-green">Login</button>
+</form>

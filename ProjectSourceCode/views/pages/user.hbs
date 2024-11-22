@@ -2,6 +2,7 @@
 {{> message}}
 <div class="container">
     <div style="background-color: #eeeeee;">
+        <img src={{user.profilepicture}}>
         {{#if isSelf}}
             <a class="btn" href="/editprofile">Edit Profile</a>
             <a class="btn" href="/upload">Create Post</a>
@@ -9,7 +10,7 @@
         <h1>{{user.username}}</h1>
         <hr>
         <h4>About</h4>
-        <p>No bio</p>
+        <p>{{user.bio}}</p>
         <h4>Posts</h4>
         {{#each posts}}
 
