@@ -32,6 +32,7 @@ Contributors:
     Alexander Carmichael
 
 Technology Stack: 
+
     Frontend
         * Express Handlebars (express-handlebars): Used as the templating engine for rendering HTML views on the             server side.
 		* Handlebars templates (.hbs files): These files define the structure and content of viewing the 		    page.
