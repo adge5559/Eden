@@ -41,10 +41,10 @@ Technology Stack:
   		and content of viewing thepage.
   		* Partials: Reusable chunks of templates (e.g., headers, footers) that 
    		simplify view development and ensure consistency across pages.
-	* CSS (Cascading Style Sheets): For styling the user interface, including layout, 
+	    * CSS (Cascading Style Sheets): For styling the user interface, including layout, 
  	colors, fonts, and responsiveness. This could involve custom CSS files or 
   	frameworks like Bootstrap, potentially served via express.static.
-	* JavaScript: Used in templates and potentially for enhancing interactivity on the 
+	    * JavaScript: Used in templates and potentially for enhancing interactivity on the 
  	client side.
     
     Backend
