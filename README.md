@@ -9,13 +9,11 @@ Application Description
     post can be tagged with relevant keywords, making it easy for users to 
     search for specific advice.
 
-	In addition to user content, Eden offers a resource page with general advice
-    for different plants, including care tips, ideal temperature ranges, and 
-    watering recommendations. This feature provides a quick reference guide for
-    plant owners who need information on how to properly care for their green 
-    companions. The platform's design ensures that users can easily find what 
-    they need, whether it is specific plant care information or another user’s 
-    unique insights.
+	Users can customize their profiles to reflect their personal style and 
+    plant preferences. They can choose from a selection of profile pictures, write 
+    a bio showcasing their favorite plants, and display their various posts. This 
+    personalization allows users to more easily connect with others.
+
 
 	Eden also includes a discover page, which presents random plant posts to 
     inspire users. Whether users are looking for advice, sharing success stories,
