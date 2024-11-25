@@ -64,7 +64,7 @@ No prerequisites to run the application.
 
 Instructions: 
 
-    Go to the link for the deployed appliccation. This will direct you to the Eden homepage, 
+    Go to the link for the deployed application. This will direct you to the Eden homepage, 
     where you can look at and search for posts. From here you can attempt to login. If you 
     do not yet have an account, please select "Register" on the login page. After you have 
     logged in, you can then go to your profile and make posts.
