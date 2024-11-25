@@ -31,8 +31,30 @@ Contributors:
     Leonard Huang,
     Alexander Carmichael
 
-Technology Stack: ?
+Technology Stack: 
+    Frontend
+        * Express Handlebars (express-handlebars): Used as the templating engine for rendering HTML views on the             server side.
+		* Handlebars templates (.hbs files): These files define the structure and content of viewing the 		    page.
+  		* Partials: Reusable chunks of templates (e.g., headers, footers) that simplify view development 		    and ensure consistency across pages.
+	* CSS (Cascading Style Sheets): For styling the user interface, including layout, colors, fonts, and 		    responsiveness. This could involve custom CSS files or frameworks like Bootstrap, potentially served 
+            via express.static.
+	* JavaScript: Used in templates and potentially for enhancing interactivity on the client side.
+    
+    Backend
+        * Node.js: The runtime environment for running the server-side application.
+        * Express.js: Web framework for building the application and handling routes.
+        * bcrypt.js: For hashing passwords to enhance security.
+        * formidable: For handling file uploads.
+	
+    Database
+        * PostgreSQL: The database used for storing user data, posts, and other application-related data when locally run.
+        * pg-promise: A library for connecting and querying the PostgreSQL database.
+	* Render: The database used for storing user data, posts, and other application-related data when run on the web.
+
+No prerequisites to run the application.
+
+Instructions: Go to the link for the deployed appliccation. This will direct you to the Eden homepage, where you can look at and search for posts. From here you can attempt to login. If you do not yet have an account, please select "Register" on the login page. After you have logged in, you can then go to your profile and make posts.
 
 How To Run Tests: ?
 
-Link to Deployed Application: ?
+Link to Deployed Application: https://eden-5h1r.onrender.com
