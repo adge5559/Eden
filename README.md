@@ -57,7 +57,7 @@ Technology Stack:
         * PostgreSQL: The database used for storing user data, posts, and other 
 	application-related data when locally run.
         * pg-promise: A library for connecting and querying the PostgreSQL database.
-	* Render: The database used for storing user data, posts, and other 
+		* Render: The database used for storing user data, posts, and other 
  	application-related data when run on the web.
 
 No prerequisites to run the application.
