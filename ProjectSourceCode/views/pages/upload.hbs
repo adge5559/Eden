@@ -29,15 +29,11 @@
             
         <!-- Tags -->
         <div id="tags-container" class="mt-4">
-            <label for="tag-1">Tags:(At Least 1)<span class="required">*</span></label>
-            <button type="button" id="add-tag-btn">Add Tag</button>
-
-            <!-- Tags Input -->
+            <label>Tags (At least 1):<span class="required">*</span></label>
+            <button type="button" id="add-tag-btn" class="btn btn-secondary btn-sm">Add Tag</button>
             <div class="tag-box d-flex align-items-center mb-2">
-                <input type="text" name="tags[]" class="form-control tag-input" placeholder="Enter your tag" required>
+                <input type="text" name="tags1" class="form-control tag-input" placeholder="Enter a tag" required>
             </div>
-
-            <!-- Addition Tags -->
             <div id="additional-tags"></div>
         </div>
 
@@ -49,20 +45,22 @@
             <!-- Initial Section -->
             <div class="section-box">
                 <hr>
-                <h3>Section <span class="section-number">1</span><span class="required">*</span></h3>
+                <h3>Section <span class="section-number">1</span></h3>
                 <div class="form-group">
-                    <label for="section-title-1">Section Title:<span class="required">*</span></label>
-                    <input type="text" id="section-title-1" name="sectiontitle[]" class="form-control" maxlength="255" placeholder="Enter section title" required>
+                    <label for="section-title-1">Section Title<span class="required">*</span></label>
+                    <input type="text" id="section-title-1" name="sectiontitle1" class="form-control" maxlength="255" placeholder="Enter section title" required>
                 </div>
                 <div class="form-group">
-                    <label for="section-content-1">Section Content:<span class="required">*</span></label>
-                    <textarea id="section-content-1" name="content[]" class="form-control" maxlength="2000" placeholder="Enter section content" requried></textarea>
+                    <label for="section-content-1">Section Content<span class="required">*</span></label>
+                    <textarea id="section-content-1" name="content1" class="form-control" maxlength="2000" placeholder="Enter section content" required></textarea>
                 </div>
+
                 <div class="form-group">
-                    <label for="section-image-1">Section Image</label>
-                    <input type="file" id="section-image-1" name="imgpath[]" class="form-control-file" accept="image/*">
+                    <label for="section-image-1">Section Image:</label>
+                    <input type="file" id="section-image-1" name="imgpath1" class="form-control-file" accept="image/*">
                 </div>
             </div>
+
         </div>
 
         <!-- Add Section Button -->
@@ -75,17 +73,16 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const maxSections = 10; // Maximum sections
-        const maxTags = 5; // Maximum tags
-        let sectionCount = 1; // Initial section count
-        let tagCount = 1; // Initial tag count
+        const maxSections = 10;
+        const maxTags = 5;
+        let sectionCount = 1;
+        let tagCount = 1;
 
         const sectionsContainer = document.getElementById('sections-container');
         const addSectionBtn = document.getElementById('add-section-btn');
-
         const tagsContainer = document.getElementById('tags-container');
         const addTagBtn = document.getElementById('add-tag-btn');
-
+        const additionalTagsContainer = document.getElementById('additional-tags');
         // Add new section
         addSectionBtn.addEventListener('click', function () {
             if (sectionCount >= maxSections) {
@@ -103,15 +100,15 @@
                 <h3>Section <span class="section-number">${sectionCount}</span></h3>
                 <div class="form-group">
                     <label for="section-title-${sectionCount}">Section Title<span class="required">*</span></label>
-                    <input type="text" id="section-title-${sectionCount}" name="sectiontitle[]" class="form-control" maxlength="255" placeholder="Enter section title" required>
+                    <input type="text" id="section-title-${sectionCount}" name="sectiontitle${sectionCount}" class="form-control" maxlength="255" placeholder="Enter section title" required>
                 </div>
                 <div class="form-group">
                     <label for="section-content-${sectionCount}">Section Content<span class="required">*</span></label>
-                    <textarea id="section-content-${sectionCount}" name="content[]" class="form-control" maxlength="2000" placeholder="Enter section content" required></textarea>
+                    <textarea id="section-content-${sectionCount}" name="content${sectionCount}" class="form-control" maxlength="2000" placeholder="Enter section content" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="section-image-${sectionCount}">Section Image</label>
-                    <input type="file" id="section-image-${sectionCount}" name="imgpath[]" class="form-control-file" accept="image/*">
+                    <input type="file" id="section-image-${sectionCount}" name="imgpath${sectionCount}" class="form-control-file" accept="image/*">
                 </div>
             `;
             sectionsContainer.appendChild(newSection);
@@ -126,14 +123,41 @@
 
             tagCount++;
 
-            // Create a new tag
-            const newTag = document.createElement('div');
-            newTag.className = 'tag-box';
-            newTag.innerHTML = `
-                <div class="tag-box d-flex align-items-center mb-2">
-                    <input type="text" name="tags[]" id="tag-${tagCount}" class="form-control tag-input" placeholder="Enter your tag" required>
-                </div>`;
-            tagsContainer.appendChild(newTag);
+            // Create a new tag input
+            const tagBox = document.createElement('div');
+            tagBox.className = 'tag-box d-flex align-items-center mb-2';
+            tagBox.innerHTML = `
+                <input type="text" name="tags${tagCount}" class="form-control tag-input" placeholder="Enter a tag" required>
+                <button type="button" class="btn btn-danger btn-sm ml-2 remove-tag-btn">Remove</button>
+            `;
+            additionalTagsContainer.appendChild(tagBox);
+
+            // Add listener for removing tags
+            const removeTagBtns = document.querySelectorAll('.remove-tag-btn');
+            removeTagBtns.forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    event.target.parentElement.remove();
+                    tagCount--;
+                });
+            });
         });
+
+        // Disable submit buttom after click
+        document.getElementById('new-post-form').addEventListener('submit', function (event) {
+            // Log the section titles
+            var sectiontitle = document.getElementsByName('sectiontitle[]');
+            var sectiontitleArray = [];
+            for (var i = 0; i < sectiontitle.length; i++) {
+                sectiontitleArray.push(sectiontitle[i].value);
+            }
+            console.log(sectiontitleArray);
+
+            // Disable the submit button
+            const submitButton = document.querySelector('.post-btn');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Posting...';
+
+            // Allow the form to be submitted
+        });        
     });
 </script>

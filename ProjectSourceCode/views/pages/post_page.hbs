@@ -61,9 +61,11 @@
       {{#each sections}}
         <div class="section mb-3">
           <h5>{{this.sectiontitle}}</h5>
-          <div class="image-container" style="display: flex; justify-content: center;">
-              <img src="{{this.imgpath}}" alt="{{this.sectiontitle}}" class="section-image" style="width: 400px; height: 250px; object-fit: cover; object-position: center; margin-bottom: 4px;">
-          </div>
+          {{#if this.imgpath}}
+            <div class="image-container" style="display: flex; justify-content: center;">
+                <img src="{{this.imgpath}}" alt="{{this.sectiontitle}}" class="section-image" style="width: 400px; height: 250px; object-fit: cover; object-position: center; margin-bottom: 4px;">
+            </div>
+          {{/if}}
           <p style="margin-bottom: 3rem;">{{this.content}}</p>
         </div>
       {{/each}}

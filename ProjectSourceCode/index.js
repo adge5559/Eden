@@ -316,7 +316,6 @@ app.get('/post/:id', async(req, res) => {
        WHERE postid = $1 
        ORDER BY createtime`
       , [postId]);
-      console.log('Comments fetched:', comments);
 
     //format for when comments were created
     comments.forEach(comment => {
@@ -443,7 +442,6 @@ app.post('/post/:id/like', async(req, res) => {
 
 
 
-
 // Upload Page
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
@@ -456,111 +454,109 @@ app.post('/create-post', async (req, res) => {
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error('Error parsing form:', err);
-      return res.status(500).send('An error occurred while uploading the files.');
-    }
-
-    console.log('Fields:', fields);
-    console.log('Files:', files);
-
-    try {
-      const { title, descriptions, sectiontitle, content } = fields;
-      const tags = Array.isArray(fields['tags[]']) ? fields['tags[]'] : [fields['tags[]']]; // Ensure tags are always an array
-
-      // Insert post
-      const post = await db.one(
-        `INSERT INTO posts (username, title, descriptions, titleimagepath, createtime)
-         VALUES ($1, $2, $3, '', CURRENT_TIMESTAMP)
-         RETURNING postid`,
-        [req.session.user.username, title, descriptions]
-      );
-      const postId = post.postid;
-
-      // Save title image
-      const postDir = path.join(__dirname, `images/Post/${postId}`);
-      if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
-
-      if (files.titleimg && files.titleimg.filepath) {
-        const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
-        fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
-
-        // Update the database
-        await db.none(
-          `UPDATE posts SET titleimagepath = $1 WHERE postid = $2`,
-          [titleImgPath, postId]
-        );
+      if (err) {
+          console.error('Error parsing form:', err);
+          return res.status(500).send('An error occurred while uploading the files.');
       }
+      const fieldsData = Object.entries(fields).map(([name, value]) => ({ name, value }));
 
-      // Insert tags
-      for (const tagName of tags) {
-        const tag = await db.oneOrNone(
-          `INSERT INTO tags (tagname) VALUES ($1) 
-           ON CONFLICT (tagname) DO NOTHING 
-           RETURNING tagid`,
-          [tagName]
-        );
-
-        const tagId = tag
-          ? tag.tagid
-          : (
-              await db.one(`SELECT tagid FROM tags WHERE tagname = $1`, [tagName])
-            ).tagid;
-
-        await db.none(
-          `INSERT INTO posttags (postid, tagid) VALUES ($1, $2)`,
-          [postId, tagId]
-        );
-      }
-
-      // Insert sections
-      // Process sections
-      if (fields['sectiontitle[]'] && fields['content[]']) {
-        const sectionTitles = Array.isArray(fields['sectiontitle[]'])
-          ? fields['sectiontitle[]']
-          : [fields['sectiontitle[]']].filter(Boolean); // Normalize and filter empty
-        const sectionContents = Array.isArray(fields['content[]'])
-          ? fields['content[]']
-          : [fields['content[]']].filter(Boolean); // Normalize and filter empty
-
-        const sectionImages = files['imgpath[]']
-          ? Array.isArray(files['imgpath[]'])
-            ? files['imgpath[]']
-            : [files['imgpath[]']]
-          : [];
-
-        for (let i = 0; i < sectionTitles.length; i++) {
-          if (!sectionTitles[i] || !sectionContents[i]) {
-            console.error(`Skipping section ${i + 1} due to missing title or content.`);
-            continue; // Skip invalid sections
+      try {
+          const { title, descriptions } = fields;
+          const tags = [];
+          for (const [key, value] of Object.entries(fields)) {
+              if (key.startsWith('tag') && value.trim()) {
+                  tags.push(value.trim());
+              }
+          }
+          const sectionTitles = [];
+          const sectionContents = [];
+          for (const [key, value] of Object.entries(fields)) {
+              if (key.startsWith('sectiontitle') && value.trim()) {
+                  sectionTitles.push(value.trim());
+              }
+              if (key.startsWith('content') && value.trim()) {
+                  sectionContents.push(value.trim());
+              }
+          }
+          const sectionImages = [];
+          for (const [key, file] of Object.entries(files)) {
+              if (key.startsWith('imgpath') && file.filepath) {
+                  sectionImages.push(file);
+              }
           }
 
-          const sectionImagePath =
-            sectionImages[i] && sectionImages[i].filepath
-              ? `/images/Post/${postId}/section${i + 1}.jpg`
-              : null;
+          // Insert post
+          const post = await db.one(
+              `INSERT INTO posts (username, title, descriptions, titleimagepath, createtime)
+               VALUES ($1, $2, $3, '', CURRENT_TIMESTAMP)
+               RETURNING postid`,
+              [req.session.user.username, title, descriptions]
+          );
+          const postId = post.postid;
 
-          if (sectionImages[i] && sectionImages[i].filepath) {
-            fs.renameSync(
-              sectionImages[i].filepath,
-              path.join(postDir, `section${i + 1}.jpg`)
+          // Save title image
+          const postDir = path.join(__dirname, `images/Post/${postId}`);
+          if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
+
+          if (files.titleimg && files.titleimg.filepath) {
+              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
+              fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
+              await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
+          }
+
+          // Insert tags
+          for (const tagName of tags) {
+              if (tagName.trim()) {
+                  const tag = await db.oneOrNone(
+                      `INSERT INTO tags (tagname) VALUES ($1)
+                       ON CONFLICT (tagname) DO NOTHING
+                       RETURNING tagid`,
+                      [tagName]
+                  );
+
+                  const tagId = tag
+                      ? tag.tagid
+                      : (await db.one(`SELECT tagid FROM tags WHERE tagname = $1`, [tagName])).tagid;
+
+                  await db.none(`INSERT INTO posttags (postid, tagid) VALUES ($1, $2)`, [postId, tagId]);
+              }
+          }
+
+          // Insert sections
+          for (let i = 0; i < sectionTitles.length; i++) {
+            if (!sectionTitles[i] || !sectionContents[i]) continue;
+        
+            let sectionImagePath = null; // Default image is null
+        
+            // Check if image is valid
+            if (
+                sectionImages[i] &&
+                sectionImages[i].filepath &&
+                sectionImages[i].originalFilename.trim() !== '' &&
+                sectionImages[i].size > 0
+            ) {
+                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
+        
+                // Move file to specific location
+                fs.renameSync(
+                    sectionImages[i].filepath,
+                    path.join(postDir, `section${i + 1}.jpg`)
+                );
+            }
+        
+            // Insert into database
+            await db.none(
+                `INSERT INTO sections (postid, sectiontitle, content, imgpath, createtime)
+                 VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+                [postId, sectionTitles[i], sectionContents[i], sectionImagePath]
             );
           }
 
-          await db.none(
-            `INSERT INTO sections (postid, sectiontitle, content, imgpath, createtime)
-            VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-            [postId, sectionTitles[i], sectionContents[i], sectionImagePath]
-          );
-        }
+          res.redirect(`/post/${postId}`);
+      } catch (error) {
+          console.error('Error creating post:', error);
+          res.status(500).render('pages/error', { message: 'An error occurred while creating the post.' });
       }
-
-
-      res.redirect(`/post/${postId}`);
-    } catch (error) {
-      console.error('Error creating post:', error);
-      res.status(500).send('An error occurred while creating the post.');
-    }
   });
 });
 
