@@ -11,7 +11,7 @@ const axios = require('axios'); // To make HTTP requests from our server. We'll 
 const fs = require("fs");
 const {IncomingForm} = require('formidable');
 //allows images to be rendered
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, '../mnt/uploads/images')));
 // use resources folder
 app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
