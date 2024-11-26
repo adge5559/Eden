@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS posts(
     username VARCHAR(255) NOT NULL,
     title VARCHAR(40) NOT NULL,
     descriptions TEXT NOT NULL,
-    titleimagepath VARCHAR(60) NOT NULL,
+    titleimg BYTEA,
     likes INT NOT NULL DEFAULT 0,
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     lastupdatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS sections(
 	sectionid  SERIAL PRIMARY KEY,
     sectiontitle VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
-    imgpath VARCHAR(60),
+    img BYTEA,
     postid INT,
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (postid) REFERENCES posts(postid)
