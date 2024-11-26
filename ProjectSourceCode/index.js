@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const fs = require("fs");
 const {IncomingForm} = require('formidable');
+const FileStore = require('session-file-store')(session);
 //allows images to be rendered
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // use resources folder
@@ -58,6 +59,12 @@ app.use(
 // initialize session variables
 app.use(
   session({
+    store: new FileStore({
+      path: '/var/data', // Ensure this matches your Render disk mount path
+      ttl: 86400, // Time to live in seconds (e.g., 1 day)
+      retries: 3, // Number of retries on failure
+      secret: process.env.SESSION_SECRET, // You can use the same secret from the environment variables
+    }),
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false,
@@ -507,11 +514,11 @@ app.post('/create-post', async (req, res) => {
           const postId = post.postid;
 
           // Save title image
-          const postDir = path.join(__dirname, `images/Post/${postId}`);
+          const postDir = path.join(__dirname, `var/data/Post/${postId}`);
           if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
-              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
+              const titleImgPath = `/var/data/Post/${postId}/titleimg.jpg`;
               fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
               await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
@@ -547,7 +554,7 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
+                sectionImagePath = `/var/data/Post/${postId}/section${i + 1}.jpg`;
         
                 // Move file to specific location
                 fs.renameSync(
