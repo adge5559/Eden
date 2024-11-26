@@ -105,3 +105,24 @@
     padding: 15px 30px; /* Adjust padding */
     border-radius: 8px; /* Slightly rounded corners */
 }
+.editmain {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.editimg {
+    width: 80px;
+}
+
+.usermain {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    margin: 0 auto; 
+}
+
+.userpfp {
+    max-width: 200px;
+}

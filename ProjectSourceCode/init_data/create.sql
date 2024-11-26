@@ -12,7 +12,8 @@ DROP TABLE IF EXISTS plants;
 CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
-    profilepicture VARCHAR(255) -- 32kb Pfp
+    profilepicture VARCHAR(255),
+    bio VARCHAR(255)
 );
 
 -- Create posts table
