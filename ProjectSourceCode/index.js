@@ -60,7 +60,7 @@ app.use(
 app.use(
   session({
     store: new FileStore({
-      path: 'ProjectSourceCode/var/data', // Ensure this matches your Render disk mount path
+      path: '/ProjectSourceCode/var/data', // Ensure this matches your Render disk mount path
       ttl: 86400, // Time to live in seconds (e.g., 1 day)
       retries: 3, // Number of retries on failure
       secret: process.env.SESSION_SECRET, // You can use the same secret from the environment variables
