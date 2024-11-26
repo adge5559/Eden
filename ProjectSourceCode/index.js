@@ -494,7 +494,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, '../mnt/uploads/images');
+  form.uploadDir = path.join(__dirname, 'images/uploads');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
