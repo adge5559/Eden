@@ -70,8 +70,6 @@ app.use(
 
 //paths
 
-
-
 app.get('/', (req, res) => {res.redirect('/discover');});
 app.get('/discover', async (req, res) => {
   try {
@@ -189,13 +187,46 @@ app.get('/logout', (req, res) => {
 
 //pathing to profile
 app.get('/profile', (req, res) => {
-  const bruh = req.session.user?.username;
-  if(bruh){
-    res.redirect('/user/' + req.session.user.username);
+  const username = req.session.user?.username;
+  if(username){
+    res.redirect('/user/' + username);
   } else{
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
   }
 });
+
+app.get("/editprofile", async (req, res) =>{
+  const username = req.session.user?.username;
+  if(username){
+    const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
+    res.render("pages/editprofile", {user: userSearch});
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+})
+
+app.post('/editprofile', async (req, res) => {
+  const bio = req.body.bio;
+  const username = req.session.user?.username;
+  if(username){
+    await db.none('UPDATE users SET bio = $1 WHERE username = $2', [bio, username]);
+    res.redirect("profile")
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+});
+
+app.post('/editprofilepic/:id', async (req, res) => {
+  const username = req.session.user?.username;
+  if(username && !isNaN(req.params.id) && (Number(req.params.id) > 0) && (Number(req.params.id) <= 6)){
+    var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
+    await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
+    res.redirect("/profile")
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+});
+
 
 app.get("/user/:username", async (req, res) => {
   //finds this user within the db with this persons username
@@ -208,7 +239,6 @@ app.get("/user/:username", async (req, res) => {
     const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1`, [req.params.username]);
 
     let posts = [] //where posts we find in the next step go
-
 
     for(const postIDObj of userPostIDs){ //iterate through all the posts found from this user
       const postID = postIDObj.postid //gets the postid of the post and assigns it to this postID var
@@ -231,10 +261,10 @@ app.get("/user/:username", async (req, res) => {
         });
 
         //getting user information that is displayed on the post
-        const user = await db.oneOrNone(
-          `SELECT username, profilepicture FROM users 
-          WHERE username = $1`, 
-          [post.username]);
+        // const user = await db.oneOrNone(
+        //   `SELECT username, profilepicture FROM users 
+        //   WHERE username = $1`, 
+        //   [post.username]);
 
         //getting comments for the post
         const comments = await db.any(
@@ -242,18 +272,19 @@ app.get("/user/:username", async (req, res) => {
            WHERE postid = $1 
            ORDER BY createtime`
           , [postID]);
-
-        //format the time each comment was posted
-        comments.forEach(comment => {
-          comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'America/Denver'
-          });
-        });
+        
+        const commentCount = comments.length
+        // //format the time each comment was posted
+        // comments.forEach(comment => {
+        //   comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
+        //     year: 'numeric',
+        //     month: 'short',
+        //     day: 'numeric',
+        //     hour: '2-digit',
+        //     minute: '2-digit',
+        //     timeZone: 'America/Denver'
+        //   });
+        // });
 
         //getting the tags for the post
         const tags = await db.any(`
@@ -263,14 +294,17 @@ app.get("/user/:username", async (req, res) => {
           WHERE posttags.postid = $1
         `, [postID]);
 
-        //getting the sections (other info than title, image, and description) for the post
-        const sections = await db.any(
-          `SELECT * FROM sections 
-          WHERE postid = $1 
-          ORDER BY createtime ASC`
-          , [postID]);
+        const postLink = "/post/" + postID
+        posts.push({post, commentCount, tags, postLink});
 
-        posts.push({post, user, comments, tags, sections}); //combines all this data we just got into a single obj, then adds it to the posts array
+        //getting the sections (other info than title, image, and description) for the post
+        // const sections = await db.any(
+        //   `SELECT * FROM sections 
+        //   WHERE postid = $1 
+        //   ORDER BY createtime ASC`
+        //   , [postID]);
+
+        // posts.push({post, user, comments, tags, sections}); //combines all this data we just got into a single obj, then adds it to the posts array
       } catch (error) { //error
         console.log(error);
         res.render('pages/error', {message: 'An unexpected error has occurred'});
