@@ -60,7 +60,7 @@ app.use(
 app.use(
   session({
     store: new FileStore({
-      path: /mnt/data/sessionLog, // Path on persistent disk
+      path: "/mnt/data/sessionLog", // Path on persistent disk
       retries: 5,  // Retry settings for store
       logFn: console.log, // Log store operations
     }),
