@@ -89,7 +89,7 @@ const PORT = process.env.PORT || 3000; // Port provided by Render
 const HOST = '0.0.0.0'; // Bind to all interfaces
 
 app.listen(PORT, HOST, () => {
-  console.log(`Server is listening on port ${PORT}`);
+  console.log(`Server is listening on port 10000`);
 });
 
 module.exports = app; // Export the app for testing or modularization
@@ -456,7 +456,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, '../mnt/uploads/images');
+  form.uploadDir = path.join('../mnt/uploads/images');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
@@ -501,7 +501,7 @@ app.post('/create-post', async (req, res) => {
           const postId = post.postid;
 
           // Save title image
-          const postDir = path.join(__dirname, `images/Post/${postId}`);
+          const postDir = path.join('/mnt/uploads/images', `Post/${postId}`);
           if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
