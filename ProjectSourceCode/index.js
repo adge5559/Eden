@@ -1,3 +1,7 @@
+
+
+
+/////////////////////////////////////
 const express = require('express'); // To build an application server or API
 const app = express();
 const handlebars = require('express-handlebars');
@@ -10,7 +14,6 @@ const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const fs = require("fs");
 const {IncomingForm} = require('formidable');
-const FileStore = require('session-file-store')(session);
 //allows images to be rendered
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // use resources folder
@@ -59,11 +62,6 @@ app.use(
 // initialize session variables
 app.use(
   session({
-    store: new FileStore({
-      path: "/mnt/data/sessionLog", // Path on persistent disk
-      retries: 5,  // Retry settings for store
-      logFn: console.log, // Log store operations
-    }),
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false,
@@ -71,6 +69,8 @@ app.use(
 );
 
 //paths
+
+
 
 app.get('/', (req, res) => {res.redirect('/discover');});
 app.get('/discover', async (req, res) => {
@@ -189,70 +189,38 @@ app.get('/logout', (req, res) => {
 
 //pathing to profile
 app.get('/profile', (req, res) => {
-  const username = req.session.user?.username;
-  if(username){
-    res.redirect('/user/' + username);
-  } else{
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
-  }
-});
-
-app.get("/editprofile", async (req, res) =>{
-  const username = req.session.user?.username;
-  if(username){
-    const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
-    res.render("pages/editprofile", {user: userSearch});
-  } else{
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
-  }
-})
-
-app.post('/editprofile', async (req, res) => {
-  const bio = req.body.bio;
-  const username = req.session.user?.username;
-  if(username){
-
-    await db.none('UPDATE users SET bio = $1 WHERE username = $2', [bio, username]);
-    res.redirect("/profile")
-  } else{
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
-  }
-});
-
-app.post('/editprofilepic/:id', async (req, res) => {
-  const username = req.session.user?.username;
-
-  if(username && !isNaN(req.params.id) && (Number(req.params.id) > 0) && (Number(req.params.id) <= 6)){
-    var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
-
-    await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
-    res.redirect("/profile")
+  const bruh = req.session.user?.username;
+  if(bruh){
+    res.redirect('/user/' + req.session.user.username);
   } else{
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
   }
 });
 
 app.get("/user/:username", async (req, res) => {
-
+  //finds this user within the db with this persons username
   const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', req.params.username);
-  if (!userSearch) {
+  if (!userSearch) { //if the username is not found
     res.render('pages/profileerr', { message: 'User not found.', error: true });
   } 
-  else{
+  else{ //user is found!
+    //find all posts this user has made
     const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1`, [req.params.username]);
-    
-    let posts = []
 
-    for(const postIDObj of userPostIDs){
-      const postID = postIDObj.postid
+    let posts = [] //where posts we find in the next step go
+
+
+    for(const postIDObj of userPostIDs){ //iterate through all the posts found from this user
+      const postID = postIDObj.postid //gets the postid of the post and assigns it to this postID var
       try {
-        const post = await db.oneOrNone(
+        const post = await db.oneOrNone( //getting the post details/information using the postID (oneOrNone mean it either returns a single post or nothing)
           'SELECT * FROM posts WHERE postid = ' + postID);
-    
-        if (!post) {
+
+        if (!post) { //if the post is not found in the database then error
           return res.render('pages/error', {message: 'Error getting user posts'});
         }
-        
+
+        //format for when the post was posted/created
         post.formattedCreateTime = new Date(post.createtime).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'short',
@@ -261,15 +229,33 @@ app.get("/user/:username", async (req, res) => {
           minute: '2-digit',
           timeZone: 'America/Denver'
         });
-          
+
+        //getting user information that is displayed on the post
+        const user = await db.oneOrNone(
+          `SELECT username, profilepicture FROM users 
+          WHERE username = $1`, 
+          [post.username]);
+
+        //getting comments for the post
         const comments = await db.any(
           `SELECT * FROM comments
            WHERE postid = $1 
            ORDER BY createtime`
           , [postID]);
 
-        const commentCount = comments.length
-        
+        //format the time each comment was posted
+        comments.forEach(comment => {
+          comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'America/Denver'
+          });
+        });
+
+        //getting the tags for the post
         const tags = await db.any(`
           SELECT tags.tagname 
           FROM posttags 
@@ -277,19 +263,25 @@ app.get("/user/:username", async (req, res) => {
           WHERE posttags.postid = $1
         `, [postID]);
 
-        const postLink = "/post/" + postID
-        posts.push({post, commentCount, tags, postLink});
-      } catch (error) {
+        //getting the sections (other info than title, image, and description) for the post
+        const sections = await db.any(
+          `SELECT * FROM sections 
+          WHERE postid = $1 
+          ORDER BY createtime ASC`
+          , [postID]);
+
+        posts.push({post, user, comments, tags, sections}); //combines all this data we just got into a single obj, then adds it to the posts array
+      } catch (error) { //error
         console.log(error);
         res.render('pages/error', {message: 'An unexpected error has occurred'});
       }
     }
-    
 
+    //if user viewing their own profile page...set isSelf to true
     if(req.session.user && userSearch.username == req.session.user.username){
       res.render('pages/user', {user: userSearch, posts: posts, isSelf: true});
     } 
-
+    //if user is viewing someone elses profile page...
     else{
       res.render('pages/user', {user: userSearch, posts: posts});
     }
@@ -299,19 +291,19 @@ app.get("/user/:username", async (req, res) => {
 // Post page
 app.get('/post/:id', async(req, res) => {
   const postId = req.params.id; //gets the id param from the url (:id)
-  
+
   try {
     //retreives the post with this postID from the posts table
     const post = await db.oneOrNone(
       `SELECT * FROM posts 
       WHERE postid = $1`, 
       [postId]);
-    
+
     //is no such post exists...error
     if (!post) {
       return res.render('pages/error', {message: 'Post not found'});
     }
-    
+
     //format for when posts were created
     post.formattedCreateTime = new Date(post.createtime).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -354,7 +346,7 @@ app.get('/post/:id', async(req, res) => {
       JOIN tags ON posttags.tagid = tags.tagid 
       WHERE posttags.postid = $1
     `, [postId]);
-    
+
     //getting the sections (other info than title, image, and description) for the post
     const sections = await db.any(
       `SELECT * FROM sections 
@@ -368,7 +360,7 @@ app.get('/post/:id', async(req, res) => {
       WHERE postid = $1`
       , [postId]);
       //console.log('Comments fetched:', comments);
-    
+
     //render the post_page template using the data passed below
     res.render('pages/post_page', {
       post,
@@ -401,7 +393,7 @@ app.post('/post/:postid/comment', async(req, res) => {
   if (!commentText || commentText.trim() === '') { //text is null or undef || comment only has whitespace
     return res.status(400).json({error: 'Comment text cannot be empty'});
   }
-  
+
   try{
     //adds comment to database if it passes the checks above
     await db.none(
@@ -468,7 +460,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, '/mnt/data/uploads/images/');
+  form.uploadDir = path.join(__dirname, '../mnt/uploads/images');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
@@ -513,11 +505,11 @@ app.post('/create-post', async (req, res) => {
           const postId = post.postid;
 
           // Save title image
-          const postDir = path.join(__dirname, `/mnt/data/uploads/images/${postId}`);
+          const postDir = path.join(__dirname, `images/Post/${postId}`);
           if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
-              const titleImgPath = `/mnt/data/uploads/images/${postId}/titleimg.jpg`;
+              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
               fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
               await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
@@ -543,9 +535,9 @@ app.post('/create-post', async (req, res) => {
           // Insert sections
           for (let i = 0; i < sectionTitles.length; i++) {
             if (!sectionTitles[i] || !sectionContents[i]) continue;
-        
+
             let sectionImagePath = null; // Default image is null
-        
+
             // Check if image is valid
             if (
                 sectionImages[i] &&
@@ -553,15 +545,15 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImagePath = `/mnt/data/uploads/images/${postId}/section${i + 1}.jpg`;
-        
+                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
+
                 // Move file to specific location
                 fs.renameSync(
                     sectionImages[i].filepath,
                     path.join(postDir, `section${i + 1}.jpg`)
                 );
             }
-        
+
             // Insert into database
             await db.none(
                 `INSERT INTO sections (postid, sectiontitle, content, imgpath, createtime)
@@ -593,7 +585,7 @@ app.get('/search', async (req, res) => {
          OR p.descriptions ILIKE $2
          OR t.tagname ILIKE $3
     `, [`%${query}%`, `%${query}%`, `%${query}%`]);
-    
+
     res.render('pages/discover', { posts });
   } catch (error) {
     console.error('Error searching for posts:', error);
