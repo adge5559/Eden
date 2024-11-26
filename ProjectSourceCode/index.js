@@ -11,7 +11,7 @@ const axios = require('axios'); // To make HTTP requests from our server. We'll 
 const fs = require("fs");
 const {IncomingForm} = require('formidable');
 //allows images to be rendered
-app.use('/images', express.static(path.join(__dirname, '../mnt/uploads/images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 // use resources folder
 app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
@@ -456,7 +456,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join('../mnt/uploads/images');
+  form.uploadDir = path.join(__dirname, '../mnt/uploads/images');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
@@ -500,21 +500,13 @@ app.post('/create-post', async (req, res) => {
           );
           const postId = post.postid;
 
+          // Save title image
+          const postDir = path.join(__dirname, `images/Post/${postId}`);
+          if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
-              // Save title image
-              const postDir = path.join('/mnt/uploads/images', `Post/${postId}`);
-              if (!fs.existsSync(postDir)) {
-                  fs.mkdirSync(postDir, { recursive: true });
-              }
-
-              const titleImgPath = `/mnt/uploads/images/Post/${postId}`;
-              //fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
-              fs.copyFileSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
-
-              // Optionally, delete the original temporary file
-              fs.unlinkSync(files.titleimg.filepath);
-
+              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
+              fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
               await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
 
@@ -549,7 +541,7 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImagePath = `/mnt/uploads/images/Post/${postId}/section${i + 1}.jpg`;
+                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
         
                 // Move file to specific location
                 fs.renameSync(
