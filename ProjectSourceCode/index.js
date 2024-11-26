@@ -84,9 +84,15 @@ app.get('/discover', async (req, res) => {
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
-module.exports = app.listen(3000);
 
-console.log('Server is listening on port 3000');
+const PORT = process.env.PORT || 3000; // Port provided by Render
+const HOST = '0.0.0.0'; // Bind to all interfaces
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
+
+module.exports = app; // Export the app for testing or modularization
 
 //register
 app.get('/register', (req, res) => {
