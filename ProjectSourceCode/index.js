@@ -209,24 +209,24 @@ app.get("/editprofile", async (req, res) =>{
 
 app.post('/editprofile', async (req, res) => {
   const bio = req.body.bio;
-  const profilepictureSelection = req.body.profilepicture;
-  console.log(req.body)
-
   const username = req.session.user?.username;
   if(username){
-    var profilepicture = "/images/ProfilePicture/1.png"
-    if(profilepictureSelection == "Picture 2"){
-      profilepicture == "/images/ProfilePicture/2.png"
-    } else if(profilepictureSelection == "Picture 3"){
-      profilepicture == "/images/ProfilePicture/3.png"
-    } else if(profilepictureSelection == "Picture 4"){
-      profilepicture == "/images/ProfilePicture/4.png"
-    } else if(profilepictureSelection == "Picture 5"){
-      profilepicture == "/images/ProfilePicture/5.png"
-    }
 
-    await db.none('UPDATE users SET (bio, profilepicture) = ($1, $2) WHERE username = $3', [bio, profilepicture, username]);
-    res.redirect("profile")
+    await db.none('UPDATE users SET bio = $1 WHERE username = $2', [bio, username]);
+    res.redirect("/profile")
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+});
+
+app.post('/editprofilepic/:id', async (req, res) => {
+  const username = req.session.user?.username;
+
+  if(username && !isNaN(req.params.id) && (Number(req.params.id) > 0) && (Number(req.params.id) <= 6)){
+    var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
+
+    await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
+    res.redirect("/profile")
   } else{
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
   }

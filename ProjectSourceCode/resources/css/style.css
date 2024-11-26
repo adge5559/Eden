@@ -113,7 +113,8 @@
 }
 
 .editimg {
-    width: 80px;
+    width: 140px;
+    height: 140px;
 }
 
 .usermain {
@@ -124,5 +125,10 @@
 }
 
 .userpfp {
-    max-width: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.formcl {
+    display: inline;
 }
