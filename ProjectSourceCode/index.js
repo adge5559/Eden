@@ -468,7 +468,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, '/uploads');
+  form.uploadDir = path.join(__dirname, '/mnt/data/uploads/images/');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
@@ -513,11 +513,11 @@ app.post('/create-post', async (req, res) => {
           const postId = post.postid;
 
           // Save title image
-          const postDir = path.join(__dirname, `/uploads/Post/${postId}`);
+          const postDir = path.join(__dirname, `/mnt/data/uploads/images/${postId}`);
           if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
-              const titleImgPath = `/uploads/Post/${postId}/titleimg.jpg`;
+              const titleImgPath = `/mnt/data/uploads/images/${postId}/titleimg.jpg`;
               fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
               await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
@@ -553,7 +553,7 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImagePath = `/uploads/Post/${postId}/section${i + 1}.jpg`;
+                sectionImagePath = `/mnt/data/uploads/images/${postId}/section${i + 1}.jpg`;
         
                 // Move file to specific location
                 fs.renameSync(
