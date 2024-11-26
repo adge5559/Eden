@@ -9,6 +9,7 @@ services:
     volumes:
       - group-project:/var/lib/postgresql/data
       - ./init_data:/docker-entrypoint-initdb.d
+      - /uploads:/uploads
   web:
     image: node:lts
     user: 'node'
@@ -22,6 +23,7 @@ services:
       - '10000:10000'
     volumes:
       - ./:/repository
+      - /uploads:/uploads
     # change the command to `npm run testandrun` to run mocha. 'npm start' does not run the tests
     command: 'npm start'
     #command: 'npm run testandrun'

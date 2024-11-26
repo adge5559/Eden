@@ -60,10 +60,9 @@ app.use(
 app.use(
   session({
     store: new FileStore({
-      path: '/ProjectSourceCode/var/data', // Ensure this matches your Render disk mount path
-      ttl: 86400, // Time to live in seconds (e.g., 1 day)
-      retries: 3, // Number of retries on failure
-      secret: process.env.SESSION_SECRET, // You can use the same secret from the environment variables
+      path: path.join('/update', 'sessions'), // Path on persistent disk
+      retries: 5,  // Retry settings for store
+      logFn: console.log, // Log store operations
     }),
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
@@ -469,7 +468,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, '/var/data');
+  form.uploadDir = path.join(__dirname, '/update');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
@@ -514,11 +513,11 @@ app.post('/create-post', async (req, res) => {
           const postId = post.postid;
 
           // Save title image
-          const postDir = path.join(__dirname, `var/data/Post/${postId}`);
+          const postDir = path.join(__dirname, `/update/Post/${postId}`);
           if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
-              const titleImgPath = `/var/data/Post/${postId}/titleimg.jpg`;
+              const titleImgPath = `/update/Post/${postId}/titleimg.jpg`;
               fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
               await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
@@ -554,7 +553,7 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImagePath = `/var/data/Post/${postId}/section${i + 1}.jpg`;
+                sectionImagePath = `/update/Post/${postId}/section${i + 1}.jpg`;
         
                 // Move file to specific location
                 fs.renameSync(
