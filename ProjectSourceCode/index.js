@@ -121,7 +121,7 @@ app.post('/register', async (req, res) => {
 app.get('/login', (req, res) => {
   if (req.session.user) {
     return res.render('pages/login', { 
-      message: 'You are already logged in. Would you like to log out?', 
+      message: 'You are already logged in. Would you like to make a new account?', 
       showLoginForm:false
     });
   }
