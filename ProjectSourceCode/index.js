@@ -500,13 +500,21 @@ app.post('/create-post', async (req, res) => {
           );
           const postId = post.postid;
 
-          // Save title image
-          const postDir = path.join('/mnt/uploads/images', `Post/${postId}`);
-          if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
 
           if (files.titleimg && files.titleimg.filepath) {
+              // Save title image
+              const postDir = path.join('/mnt/uploads/images', `Post/${postId}`);
+              if (!fs.existsSync(postDir)) {
+                  fs.mkdirSync(postDir, { recursive: true });
+              }
+
               const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
-              fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
+              //fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
+              fs.copyFileSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
+
+              // Optionally, delete the original temporary file
+              fs.unlinkSync(files.titleimg.filepath);
+
               await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
 
