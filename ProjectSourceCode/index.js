@@ -230,7 +230,6 @@ app.get("/user/:username", async (req, res) => {
     
     let posts = []
 
-
     for(const postIDObj of userPostIDs){
       const postID = postIDObj.postid
       try {
@@ -249,28 +248,14 @@ app.get("/user/:username", async (req, res) => {
           minute: '2-digit',
           timeZone: 'America/Denver'
         });
-        
-        const user = await db.oneOrNone(
-          `SELECT username, profilepicture FROM users 
-          WHERE username = $1`, 
-          [post.username]);
           
         const comments = await db.any(
           `SELECT * FROM comments
            WHERE postid = $1 
            ORDER BY createtime`
           , [postID]);
-        
-        comments.forEach(comment => {
-          comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'America/Denver'
-          });
-        });
+
+        const commentCount = comments.length
         
         const tags = await db.any(`
           SELECT tags.tagname 
@@ -278,14 +263,9 @@ app.get("/user/:username", async (req, res) => {
           JOIN tags ON posttags.tagid = tags.tagid 
           WHERE posttags.postid = $1
         `, [postID]);
-        
-        const sections = await db.any(
-          `SELECT * FROM sections 
-          WHERE postid = $1 
-          ORDER BY createtime ASC`
-          , [postID]);
-        
-        posts.push({post, user, comments, tags, sections});
+
+        const postLink = "/post/" + postID
+        posts.push({post, commentCount, tags, postLink});
       } catch (error) {
         console.log(error);
         res.render('pages/error', {message: 'An unexpected error has occurred'});

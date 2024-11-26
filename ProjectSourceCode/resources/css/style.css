@@ -68,3 +68,24 @@
     color: #9DC183;
 }
 
+.editmain {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.editimg {
+    width: 80px;
+}
+
+.usermain {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    margin: 0 auto; 
+}
+
+.userpfp {
+    max-width: 200px;
+}
