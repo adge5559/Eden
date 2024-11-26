@@ -4,6 +4,8 @@ services:
     env_file: .env
     expose:
       - '5432'
+    ports:
+      - '5432:5432'  # External access (for connecting from the host)
     volumes:
       - group-project:/var/lib/postgresql/data
       - ./init_data:/docker-entrypoint-initdb.d
@@ -17,7 +19,7 @@ services:
     depends_on:
       - db
     ports:
-      - '3000:3000'
+      - '10000:10000'
     volumes:
       - ./:/repository
     # change the command to `npm run testandrun` to run mocha. 'npm start' does not run the tests
