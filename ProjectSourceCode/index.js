@@ -508,7 +508,7 @@ app.post('/create-post', async (req, res) => {
                   fs.mkdirSync(postDir, { recursive: true });
               }
 
-              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
+              const titleImgPath = `/mnt/uploads/images/Post/${postId}`;
               //fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
               fs.copyFileSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
 
@@ -549,7 +549,7 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
+                sectionImagePath = `/mnt/uploads/images/Post/${postId}/section${i + 1}.jpg`;
         
                 // Move file to specific location
                 fs.renameSync(
