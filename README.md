@@ -67,6 +67,11 @@ Instructions:
     do not yet have an account, please select "Register" on the login page. After you have 
     logged in, you can then go to your profile and make posts.
 
-How To Run Tests: ?
+How To Run Tests:
+
+    Go to the docker-compose.yaml. Comment out command: 'npm start' and uncomment
+    command: 'npm run testandrun'. Run docker compose shutdown -v in order to clear the
+    database. Then, run docker compose up to run the tests. The result of the tests will
+    be displayed in the console.
 
 Link to Deployed Application: https://eden-5h1r.onrender.com
