@@ -2,8 +2,10 @@
 
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 style="color:#09570d;">Create a New Post</h1>
-        <button type="submit" form="new-post-form" class="btn btn-post-green">Post</button>
+        <h1 style="color:green;">Create a New Post</h1>
+        <button type="submit" form="new-post-form" class="btn post-btn" style="background-color: #9DC183; border: none; color: white; padding: 12px 24px; font-size: 18px; border-radius: 8px; min-width: 150px;">
+    Post
+</button>
     </div>
 
     <form id="new-post-form" action="/create-post" method="POST" enctype="multipart/form-data">
@@ -38,7 +40,7 @@
 
         <!-- Sections -->
         <div id="sections-container">
-            <h2>Sections (Max 10)</h2>
+            <h2 style="color:green">Sections (Max 10)</h2>
             <p>You can add up to 10 sections. For each section, a title and content are required.</p>
 
             <!-- Initial Section -->
