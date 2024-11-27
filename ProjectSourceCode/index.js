@@ -224,7 +224,7 @@ app.post('/editprofilepic/:id', async (req, res) => {
   const username = req.session.user?.username;
   //The 2-4th part of this boolean expression verify that id is a valid profile picture number. The hardcoded references are the ids of the first and last profile picture
   //The profile pictures must be in sequential order in the folder
-  if(username && !isNaN(req.params.id) && (Number(req.params.id) >= 1) && (Number(req.params.id) <= 6)){
+  if(username && !isNaN(req.params.id) && (Number(req.params.id) >= 1) && (Number(req.params.id) <= 7)){
     var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
     await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
     res.redirect("/profile")

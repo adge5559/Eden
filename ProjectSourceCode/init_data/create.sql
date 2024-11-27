@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS plants;
 CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
-    profilepicture VARCHAR(255),
+    profilepicture VARCHAR(255) DEFAULT '/images/ProfilePicture/7.webp',
     bio VARCHAR(255)
 );
 
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS posts(
     username VARCHAR(255) NOT NULL,
     title VARCHAR(40) NOT NULL,
     descriptions TEXT NOT NULL,
+    titleimagepath VARCHAR(60) NOT NULL,
     titleimg BYTEA,
     likes INT NOT NULL DEFAULT 0,
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -34,6 +35,7 @@ CREATE TABLE IF NOT EXISTS sections(
 	sectionid  SERIAL PRIMARY KEY,
     sectiontitle VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
+    imgpath VARCHAR(60),
     img BYTEA,
     postid INT,
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -71,4 +73,3 @@ CREATE TABLE IF NOT EXISTS plants (
   description TEXT NOT NULL,
   imagepath VARCHAR(255) NOT NULL
 );
-

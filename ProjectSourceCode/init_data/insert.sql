@@ -1,15 +1,15 @@
 -- Insert test user
 -- 7654321
-INSERT INTO users (username, password, profilepicture)
-VALUES ('new_user_1', '$2y$10$LIg.BKGv8rSg7VouSXMXceHhGdGN6jrwSsfmdM9R0CHE2R1nqJRTq', '/images/ProfilePicture/new_user_1.jpg');
+INSERT INTO users (username, password)
+VALUES ('new_user_1', '$2y$10$LIg.BKGv8rSg7VouSXMXceHhGdGN6jrwSsfmdM9R0CHE2R1nqJRTq');
 
 -- Insert a new user
 -- 1234567
-INSERT INTO users (username, password, profilepicture)
-VALUES ('new_user_2', '$2y$10$JtjNckhF.0hZB8I.7hp3rewPMHPkyS9oogaJTpvQA13kzBRvpK7Iq', '/images/ProfilePicture/new_user_2.jpg');
+INSERT INTO users (username, password)
+VALUES ('new_user_2', '$2y$10$JtjNckhF.0hZB8I.7hp3rewPMHPkyS9oogaJTpvQA13kzBRvpK7Iq');
 
-INSERT INTO users (username, password, profilepicture)
-VALUES ('Eden', '123', '/images/ProfilePicture/new_user_2.jpg');
+INSERT INTO users (username, password)
+VALUES ('Eden', '123');
 
 
 -- Insert Post1
