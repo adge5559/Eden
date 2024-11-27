@@ -1,20 +1,24 @@
 
 
 
+
 /////////////////////////////////////
-const express = require('express');
+const express = require('express'); // To build an application server or API
 const app = express();
 const handlebars = require('express-handlebars');
+const Handlebars = require('handlebars');
 const path = require('path');
-const pgp = require('pg-promise')();
+const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
-const session = require('express-session');
-const FileStore = require('session-file-store')(session);
-const fs = require('fs');
-const { IncomingForm } = require('formidable');
-const bcrypt = require('bcryptjs');
-const axios = require('axios');
-
+const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
+const bcrypt = require('bcryptjs'); //  To hash passwords
+const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const fs = require("fs");
+const {IncomingForm} = require('formidable');
+//allows images to be rendered
+app.use('/images', express.static(path.join(__dirname, 'images')));
+// use resources folder
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
@@ -67,13 +71,11 @@ app.use(
 
 //paths
 
-
-
 app.get('/', (req, res) => {res.redirect('/discover');});
 app.get('/discover', async (req, res) => {
   try {
     // Fetch all posts from the database
-    const posts = await db.query('SELECT postid, title, titleimg, descriptions FROM posts'); // Adjust query as needed
+    const posts = await db.query('SELECT postid, title, titleimagepath, descriptions FROM posts'); // Adjust query as needed
 
     // Render the page and pass the posts data
     res.render('pages/discover', { posts });
@@ -186,13 +188,46 @@ app.get('/logout', (req, res) => {
 
 //pathing to profile
 app.get('/profile', (req, res) => {
-  const bruh = req.session.user?.username;
-  if(bruh){
-    res.redirect('/user/' + req.session.user.username);
+  const username = req.session.user?.username;
+  if(username){
+    res.redirect('/user/' + username);
   } else{
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
   }
 });
+
+app.get("/editprofile", async (req, res) =>{
+  const username = req.session.user?.username;
+  if(username){
+    const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
+    res.render("pages/editprofile", {user: userSearch});
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+})
+
+app.post('/editprofile', async (req, res) => {
+  const bio = req.body.bio;
+  const username = req.session.user?.username;
+  if(username){
+    await db.none('UPDATE users SET bio = $1 WHERE username = $2', [bio, username]);
+    res.redirect("profile")
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+});
+
+app.post('/editprofilepic/:id', async (req, res) => {
+  const username = req.session.user?.username;
+  if(username && !isNaN(req.params.id) && (Number(req.params.id) > 0) && (Number(req.params.id) <= 6)){
+    var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
+    await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
+    res.redirect("/profile")
+  } else{
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  }
+});
+
 
 app.get("/user/:username", async (req, res) => {
   //finds this user within the db with this persons username
@@ -205,7 +240,6 @@ app.get("/user/:username", async (req, res) => {
     const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1`, [req.params.username]);
 
     let posts = [] //where posts we find in the next step go
-
 
     for(const postIDObj of userPostIDs){ //iterate through all the posts found from this user
       const postID = postIDObj.postid //gets the postid of the post and assigns it to this postID var
@@ -228,10 +262,10 @@ app.get("/user/:username", async (req, res) => {
         });
 
         //getting user information that is displayed on the post
-        const user = await db.oneOrNone(
-          `SELECT username, profilepicture FROM users 
-          WHERE username = $1`, 
-          [post.username]);
+        // const user = await db.oneOrNone(
+        //   `SELECT username, profilepicture FROM users 
+        //   WHERE username = $1`, 
+        //   [post.username]);
 
         //getting comments for the post
         const comments = await db.any(
@@ -239,18 +273,19 @@ app.get("/user/:username", async (req, res) => {
            WHERE postid = $1 
            ORDER BY createtime`
           , [postID]);
-
-        //format the time each comment was posted
-        comments.forEach(comment => {
-          comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'America/Denver'
-          });
-        });
+        
+        const commentCount = comments.length
+        // //format the time each comment was posted
+        // comments.forEach(comment => {
+        //   comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
+        //     year: 'numeric',
+        //     month: 'short',
+        //     day: 'numeric',
+        //     hour: '2-digit',
+        //     minute: '2-digit',
+        //     timeZone: 'America/Denver'
+        //   });
+        // });
 
         //getting the tags for the post
         const tags = await db.any(`
@@ -260,14 +295,17 @@ app.get("/user/:username", async (req, res) => {
           WHERE posttags.postid = $1
         `, [postID]);
 
-        //getting the sections (other info than title, image, and description) for the post
-        const sections = await db.any(
-          `SELECT * FROM sections 
-          WHERE postid = $1 
-          ORDER BY createtime ASC`
-          , [postID]);
+        const postLink = "/post/" + postID
+        posts.push({post, commentCount, tags, postLink});
 
-        posts.push({post, user, comments, tags, sections}); //combines all this data we just got into a single obj, then adds it to the posts array
+        //getting the sections (other info than title, image, and description) for the post
+        // const sections = await db.any(
+        //   `SELECT * FROM sections 
+        //   WHERE postid = $1 
+        //   ORDER BY createtime ASC`
+        //   , [postID]);
+
+        // posts.push({post, user, comments, tags, sections}); //combines all this data we just got into a single obj, then adds it to the posts array
       } catch (error) { //error
         console.log(error);
         res.render('pages/error', {message: 'An unexpected error has occurred'});
@@ -457,7 +495,7 @@ app.get('/upload', (req, res) => {
 // Save posts
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, '../mnt/uploads/images');
+  form.uploadDir = path.join(__dirname, 'images/uploads');
   form.keepExtensions = true;
 
   form.parse(req, async (err, fields, files) => {
@@ -465,7 +503,6 @@ app.post('/create-post', async (req, res) => {
           console.error('Error parsing form:', err);
           return res.status(500).send('An error occurred while uploading the files.');
       }
-
       const fieldsData = Object.entries(fields).map(([name, value]) => ({ name, value }));
 
       try {
@@ -476,7 +513,6 @@ app.post('/create-post', async (req, res) => {
                   tags.push(value.trim());
               }
           }
-
           const sectionTitles = [];
           const sectionContents = [];
           for (const [key, value] of Object.entries(fields)) {
@@ -487,7 +523,6 @@ app.post('/create-post', async (req, res) => {
                   sectionContents.push(value.trim());
               }
           }
-
           const sectionImages = [];
           for (const [key, file] of Object.entries(files)) {
               if (key.startsWith('imgpath') && file.filepath) {
@@ -497,18 +532,21 @@ app.post('/create-post', async (req, res) => {
 
           // Insert post
           const post = await db.one(
-              `INSERT INTO posts (username, title, descriptions, titleimg, createtime)
-               VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+              `INSERT INTO posts (username, title, descriptions, titleimagepath, createtime)
+               VALUES ($1, $2, $3, '', CURRENT_TIMESTAMP)
                RETURNING postid`,
-              [req.session.user.username, title, descriptions, null]  // Set titleimg to null for now
+              [req.session.user.username, title, descriptions]
           );
           const postId = post.postid;
 
-          // Save title image as BYTEA
-          let titleImgBuffer = null;
+          // Save title image
+          const postDir = path.join(__dirname, `images/Post/${postId}`);
+          if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
+
           if (files.titleimg && files.titleimg.filepath) {
-              titleImgBuffer = fs.readFileSync(files.titleimg.filepath); // Read file as Buffer
-              await db.none(`UPDATE posts SET titleimg = $1 WHERE postid = $2`, [titleImgBuffer, postId]);
+              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
+              fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
+              await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
           }
 
           // Insert tags
@@ -533,7 +571,7 @@ app.post('/create-post', async (req, res) => {
           for (let i = 0; i < sectionTitles.length; i++) {
             if (!sectionTitles[i] || !sectionContents[i]) continue;
 
-            let sectionImageBuffer = null; // Default image is null
+            let sectionImagePath = null; // Default image is null
 
             // Check if image is valid
             if (
@@ -542,14 +580,20 @@ app.post('/create-post', async (req, res) => {
                 sectionImages[i].originalFilename.trim() !== '' &&
                 sectionImages[i].size > 0
             ) {
-                sectionImageBuffer = fs.readFileSync(sectionImages[i].filepath); // Read image as Buffer
+                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
+
+                // Move file to specific location
+                fs.renameSync(
+                    sectionImages[i].filepath,
+                    path.join(postDir, `section${i + 1}.jpg`)
+                );
             }
 
             // Insert into database
             await db.none(
-                `INSERT INTO sections (postid, sectiontitle, content, img, createtime)
+                `INSERT INTO sections (postid, sectiontitle, content, imgpath, createtime)
                  VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-                [postId, sectionTitles[i], sectionContents[i], sectionImageBuffer]
+                [postId, sectionTitles[i], sectionContents[i], sectionImagePath]
             );
           }
 
