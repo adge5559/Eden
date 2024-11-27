@@ -186,8 +186,9 @@ app.get('/logout', (req, res) => {
   }
 });
 
-//pathing to profile
 app.get('/profile', (req, res) => {
+  //If there is no logged in user, req.session.user is undefined, and trying to access undefined.username crashes the web server
+  //user?.username short circuits to undefined if user is undefined or null
   const username = req.session.user?.username;
   if(username){
     res.redirect('/user/' + username);
@@ -206,6 +207,7 @@ app.get("/editprofile", async (req, res) =>{
   }
 })
 
+//Endpoint for submitting the bio form
 app.post('/editprofile', async (req, res) => {
   const bio = req.body.bio;
   const username = req.session.user?.username;
@@ -217,9 +219,12 @@ app.post('/editprofile', async (req, res) => {
   }
 });
 
+//Endpoint for submitting the profile picture. The pictures must be named number.webp where number is an integer
 app.post('/editprofilepic/:id', async (req, res) => {
   const username = req.session.user?.username;
-  if(username && !isNaN(req.params.id) && (Number(req.params.id) > 0) && (Number(req.params.id) <= 6)){
+  //The 2-4th part of this boolean expression verify that id is a valid profile picture number. The hardcoded references are the ids of the first and last profile picture
+  //The profile pictures must be in sequential order in the folder
+  if(username && !isNaN(req.params.id) && (Number(req.params.id) >= 1) && (Number(req.params.id) <= 6)){
     var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
     await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
     res.redirect("/profile")
@@ -229,29 +234,31 @@ app.post('/editprofilepic/:id', async (req, res) => {
 });
 
 
+//Displays the user page for the username given in :username (req.params.username)
+//The profile page contains the username, profile picture, bio, and all of the users posts displayed in cards
 app.get("/user/:username", async (req, res) => {
-  //finds this user within the db with this persons username
+
   const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', req.params.username);
-  if (!userSearch) { //if the username is not found
+  if (!userSearch) {
     res.render('pages/profileerr', { message: 'User not found.', error: true });
-  } 
-  else{ //user is found!
-    //find all posts this user has made
+  } else{
+
     const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1`, [req.params.username]);
+    
+    let posts = []
 
-    let posts = [] //where posts we find in the next step go
-
-    for(const postIDObj of userPostIDs){ //iterate through all the posts found from this user
-      const postID = postIDObj.postid //gets the postid of the post and assigns it to this postID var
+    for(const postIDObj of userPostIDs){
+      //The psql query for postid's returns an array of objects with a property called "postid" which corresponds to the actual post id, which is why the id is obtained through postIDObj.postid
+      const postID = postIDObj.postid
       try {
-        const post = await db.oneOrNone( //getting the post details/information using the postID (oneOrNone mean it either returns a single post or nothing)
-          'SELECT * FROM posts WHERE postid = ' + postID);
 
-        if (!post) { //if the post is not found in the database then error
+        const post = await db.oneOrNone('SELECT * FROM posts WHERE postid = ' + postID);
+        
+        //Error case for if the post associated with an id can't be found
+        if (!post) {
           return res.render('pages/error', {message: 'Error getting user posts'});
         }
-
-        //format for when the post was posted/created
+        
         post.formattedCreateTime = new Date(post.createtime).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'short',
@@ -260,34 +267,12 @@ app.get("/user/:username", async (req, res) => {
           minute: '2-digit',
           timeZone: 'America/Denver'
         });
-
-        //getting user information that is displayed on the post
-        // const user = await db.oneOrNone(
-        //   `SELECT username, profilepicture FROM users 
-        //   WHERE username = $1`, 
-        //   [post.username]);
-
-        //getting comments for the post
-        const comments = await db.any(
-          `SELECT * FROM comments
-           WHERE postid = $1 
-           ORDER BY createtime`
-          , [postID]);
         
+        //The post cards do not display comments, but do display the number of comments
+        const comments = await db.any(
+          `SELECT * FROM comments WHERE postid = $1`, [postID]);
         const commentCount = comments.length
-        // //format the time each comment was posted
-        // comments.forEach(comment => {
-        //   comment.formattedCreateTime = new Date(comment.createtime).toLocaleDateString('en-US', {
-        //     year: 'numeric',
-        //     month: 'short',
-        //     day: 'numeric',
-        //     hour: '2-digit',
-        //     minute: '2-digit',
-        //     timeZone: 'America/Denver'
-        //   });
-        // });
-
-        //getting the tags for the post
+        
         const tags = await db.any(`
           SELECT tags.tagname 
           FROM posttags 
@@ -295,31 +280,23 @@ app.get("/user/:username", async (req, res) => {
           WHERE posttags.postid = $1
         `, [postID]);
 
+        //Link to the full post page
         const postLink = "/post/" + postID
+
         posts.push({post, commentCount, tags, postLink});
-
-        //getting the sections (other info than title, image, and description) for the post
-        // const sections = await db.any(
-        //   `SELECT * FROM sections 
-        //   WHERE postid = $1 
-        //   ORDER BY createtime ASC`
-        //   , [postID]);
-
-        // posts.push({post, user, comments, tags, sections}); //combines all this data we just got into a single obj, then adds it to the posts array
-      } catch (error) { //error
+      } catch (error) {
         console.log(error);
         res.render('pages/error', {message: 'An unexpected error has occurred'});
       }
     }
-
-    //if user viewing their own profile page...set isSelf to true
+    
+    var viewingOwnPage = false
+    //The first conditional makes sure that there is a user logged in. The second half checks to see if they're viewing their own page
+    //If isSelf is true, buttons to create posts and edit the user's page are displayed
     if(req.session.user && userSearch.username == req.session.user.username){
-      res.render('pages/user', {user: userSearch, posts: posts, isSelf: true});
-    } 
-    //if user is viewing someone elses profile page...
-    else{
-      res.render('pages/user', {user: userSearch, posts: posts});
+      viewingOwnPage = true
     }
+    res.render('pages/user', {user: userSearch, posts: posts, isSelf: viewingOwnPage});
   }
 });
 
@@ -483,9 +460,6 @@ app.post('/post/:id/like', async(req, res) => {
     res.status(500).json({error: 'An error occurred while liking the post'});
   }
 });
-
-
-
 
 // Upload Page
 app.get('/upload', (req, res) => {
