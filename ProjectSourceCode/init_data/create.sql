@@ -10,10 +10,10 @@ DROP TABLE IF EXISTS plants;
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
-    username VARCHAR(255) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
-    profilepicture VARCHAR(255) DEFAULT '/images/ProfilePicture/7.webp',
-    bio VARCHAR(255)
+    username text PRIMARY KEY,
+    password text NOT NULL,
+    profilepicture text DEFAULT '/images/ProfilePicture/7.webp',
+    bio text
 );
 
 -- Create posts table
@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS posts(
     titleimagepath VARCHAR(60) NOT NULL,
     titleimg BYTEA,
     likes INT NOT NULL DEFAULT 0,
+    users_who_liked text[],
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     lastupdatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (username) REFERENCES users(username)

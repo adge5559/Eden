@@ -439,20 +439,26 @@ app.post('/post/:postid/comment', async(req, res) => {
 
 // Likes
 app.post('/post/:id/like', async(req, res) => {
-  const postId = req.params.id; //gets the postID from the url (:id)
+  const postID = req.params.id; //gets the postID from the url (:id)
   try {
-    //add a like to the like count
-    await db.none(
-        `UPDATE posts SET likes = likes + 1 
-        WHERE postid = $1`,
-        [postId]
-    );
+    //Throw error if the user isn't logged in
+    if(!req.session.user){
+      throw new Error('User not logged in');
+    }
 
+    var usersWhoLiked = (await db.one(`SELECT users_who_liked FROM posts WHERE postid = $1`, [postID])).users_who_liked
+
+    //if the current user didn't like it
+    if(!usersWhoLiked?.includes(req.session.user.username)){
+      //add current user to the list who liked
+      await db.none('UPDATE posts SET users_who_liked = users_who_liked || ARRAY[$1] WHERE postid = $2', [req.session.user.username, postID])
+
+      //add a like to the like count
+      await db.none(`UPDATE posts SET likes = likes + 1 WHERE postid = $1`, [postID]);
+    }
+    
     //get updated like count for the post
-    const updatedPost = await db.one(
-      `SELECT likes FROM posts 
-      WHERE postid = $1`
-      , [postId]);
+    const updatedPost = await db.one(`SELECT likes FROM posts WHERE postid = $1`, [postID]);
 
     res.json({likes: updatedPost.likes});//shows the new like count without the user hvaing to update the page
   } catch (error) {//error case
