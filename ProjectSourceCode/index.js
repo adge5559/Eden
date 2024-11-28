@@ -15,6 +15,12 @@ const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const fs = require("fs");
 const {IncomingForm} = require('formidable');
+
+const multer  = require('multer')
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
+
+
 //allows images to be rendered
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // use resources folder
@@ -311,6 +317,8 @@ app.get('/post/:id', async(req, res) => {
       WHERE postid = $1`, 
       [postId]);
 
+      const imgData = post.titleimgb.toString('base64')
+
     //is no such post exists...error
     if (!post) {
       return res.render('pages/error', {message: 'Post not found'});
@@ -381,7 +389,8 @@ app.get('/post/:id', async(req, res) => {
       comments,
       tags,
       sections,
-      is_logged_in: req.session.user
+      is_logged_in: req.session.user,
+      img_data: imgData
     });
   } catch (error) { //errors
     console.log(err);
@@ -471,8 +480,27 @@ app.post('/post/:id/like', async(req, res) => {
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
 });
+ 
+app.post('/create-post', upload.any(), async function (req, res) {
+  var titleimgb
+  for(file in req.files){
+    if(req.files[file].fieldname == "titleimg"){
+      titleimgb = req.files[file].buffer;
+      console.log(typeof(req.files[file].buffer))
+      break
+    }
+  }
 
-// Save posts
+  var title = req.body.title
+  var descriptions = req.body.descriptions
+
+  const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgb, createtime)
+    VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgb]);
+
+  console.log(post)
+  res.redirect(`/post/${post.postid}`);
+})
+/*
 app.post('/create-post', async (req, res) => {
   const form = new IncomingForm();
   form.uploadDir = path.join(__dirname, 'images/uploads');
@@ -584,7 +612,7 @@ app.post('/create-post', async (req, res) => {
       }
   });
 });
-
+*/
 
 
 //Search Page
