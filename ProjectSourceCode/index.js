@@ -83,8 +83,11 @@ async function convertAllImgpToImgb(){
   for(const count in postIDs){
     const postID = postIDs[count].postid
     const post = await db.one(`SELECT * FROM posts WHERE postid = $1`, [postID]);
-    var imgBuffer = fs.readFileSync(path.resolve(__dirname, post.titleimgp), function(err, buffer){})
-    await db.none('UPDATE posts SET titleimgbase = $1 WHERE postid = $2', [imgBuffer.toString('base64'), postID]);
+    //Only convert if the post has a title img path
+    if(post.titleimgp){
+      var imgBuffer = fs.readFileSync(path.resolve(__dirname, post.titleimgp), function(err, buffer){})
+      await db.none('UPDATE posts SET titleimgbase = $1 WHERE postid = $2', ["data:image/png;base64," + imgBuffer.toString('base64'), postID]);
+    }
   }
 }
 
@@ -109,7 +112,7 @@ app.get('/discover', async (req, res) => {
     res.render('pages/discover', { posts});
   } catch (error) {
     console.error('Error fetching posts:', error);
-    res.status(500).send('An error occurred while fetching posts.');
+    res.status(500).send('An error occurred while fetching posts. ' + error);
   }
 });
 app.get('/welcome', (req, res) => {
@@ -168,13 +171,13 @@ app.post('/login', async (req, res) => {
       const userSearch = await db.oneOrNone(query, values);
       //if no user found send to register
       if (!userSearch) {
-          return res.render('pages/login', { message: 'User not found. Please register.', error: true });
+        return res.render('pages/login', { message: 'User not found. Please register.', error: true });
       }
       //compare the entered password with the stored hashed password
       const match = await bcrypt.compare(password, userSearch.password);
       //if passwords don't match error
       if (!match) {
-          return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
+        return res.render('pages/login', { message: 'Incorrect username or password.', error: true });
       }
       //save user session
       req.session.user = {
@@ -326,7 +329,6 @@ app.get('/post/:id', async(req, res) => {
   try {
     //retreives the post with this postID from the posts table
     const post = await db.oneOrNone(`SELECT * FROM posts WHERE postid = $1`, [postId]);
-    console.log(post)
 
     //is no such post exists...error
     if (!post) {
@@ -383,12 +385,12 @@ app.get('/post/:id', async(req, res) => {
       ORDER BY createtime ASC`
       , [postId]);
 
+
     //get the description of the post
     const descriptions = await db.any(
     `SELECT descriptions FROM posts 
       WHERE postid = $1`
       , [postId]);
-      //console.log('Comments fetched:', comments);
 
     //render the post_page template using the data passed below
     res.render('pages/post_page', {
@@ -490,139 +492,75 @@ app.get('/upload', (req, res) => {
 });
  
 app.post('/create-post', upload.any(), async function (req, res) {
-  var titleimgbase
-  for(file in req.files){
-    if(req.files[file].fieldname == "titleimg"){
-      const titleimgb = req.files[file].buffer;
-      console.log(typeof(req.files[file].buffer))
-      titleimgbase = titleimgb.toString('base64')
-      break
+  if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.title || !req.body.tags1 || !req.body.descriptions){
+    res.render('pages/profileerr', { message: 'Malformed post syntax.', error: true });
+  } else{
+    try{
+      var titleimgbase = "data:" + req.files[0].mimetype + ";base64," + req.files[0].buffer.toString('base64')
+
+      var title = req.body.title
+      var descriptions = req.body.descriptions
+  
+      const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgbase, createtime)
+        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgbase]);
+  
+      var sectionsArr = new Array()
+  
+      for(let counter = 1; counter < 15; counter++){
+        var sectionTitle = req.body['sectiontitle' + counter]
+        var content = req.body['content' + counter]
+        sectionTitle = (sectionTitle == undefined) ? "" : sectionTitle
+        content = (content == undefined) ? "" : content
+  
+        var sectionImg = null
+        for(var i = 1; i < req.files.length; i++){
+          if(req.files[i].fieldname == "imgpath" + counter){
+            sectionImg = "data:" + req.files[0].mimetype + ";base64," + req.files[i].buffer.toString('base64')
+            break
+          }
+        }
+  
+        if(sectionTitle == "" && content == "" && sectionImg == null){
+          continue
+        }
+  
+        sectionsArr.push({
+          sectionTitle: sectionTitle.trim(),
+          content: content.trim(),
+          sectionImg: sectionImg
+        })
+      }
+  
+      for (let i = 0; i < sectionsArr.length; i++) {
+        if(sectionsArr[i].sectionImg == null){
+          await db.none(
+            `INSERT INTO sections (postid, sectiontitle, content, createtime)
+            VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
+            [post.postid, sectionsArr[i].sectionTitle, sectionsArr[i].content]
+          );
+        } else{
+          await db.none(
+            `INSERT INTO sections (postid, sectiontitle, content, imgbase, createtime)
+            VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+            [post.postid, sectionsArr[i].sectionTitle, sectionsArr[i].content, sectionsArr[i].sectionImg]
+          );
+        }
+      }
+  
+      for(let counter = 1; req.body['tags' + counter] != undefined; counter++){
+        var tagName = req.body['tags' + counter].trim()
+        const tag = await db.oneOrNone(`INSERT INTO tags (tagname) VALUES ($1) ON CONFLICT (tagname) DO NOTHING RETURNING tagid`,[tagName]);
+        const tagID = tag ? tag.tagid : (await db.one(`SELECT tagid FROM tags WHERE tagname = $1`, [tagName])).tagid;
+        await db.none(`INSERT INTO posttags (postid, tagid) VALUES ($1, $2)`, [post.postid, tagID]);
+      }
+  
+      res.redirect(`/post/${post.postid}`);
+    } catch(error){
+      console.error('Error creating post:', error);
+      res.status(500).render('pages/error', { message: 'An error occurred while creating the post. ' + error });
     }
   }
-
-  var title = req.body.title
-  var descriptions = req.body.descriptions
-
-  const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgbase, createtime)
-    VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgbase]);
-
-  console.log(post)
-  res.redirect(`/post/${post.postid}`);
 })
-/*
-app.post('/create-post', async (req, res) => {
-  const form = new IncomingForm();
-  form.uploadDir = path.join(__dirname, 'images/uploads');
-  form.keepExtensions = true;
-
-  form.parse(req, async (err, fields, files) => {
-      if (err) {
-          console.error('Error parsing form:', err);
-          return res.status(500).send('An error occurred while uploading the files.');
-      }
-      const fieldsData = Object.entries(fields).map(([name, value]) => ({ name, value }));
-
-      try {
-          const { title, descriptions } = fields;
-          const tags = [];
-          for (const [key, value] of Object.entries(fields)) {
-              if (key.startsWith('tag') && value.trim()) {
-                  tags.push(value.trim());
-              }
-          }
-          const sectionTitles = [];
-          const sectionContents = [];
-          for (const [key, value] of Object.entries(fields)) {
-              if (key.startsWith('sectiontitle') && value.trim()) {
-                  sectionTitles.push(value.trim());
-              }
-              if (key.startsWith('content') && value.trim()) {
-                  sectionContents.push(value.trim());
-              }
-          }
-          const sectionImages = [];
-          for (const [key, file] of Object.entries(files)) {
-              if (key.startsWith('imgpath') && file.filepath) {
-                  sectionImages.push(file);
-              }
-          }
-
-          // Insert post
-          const post = await db.one(
-              `INSERT INTO posts (username, title, descriptions, titleimagepath, createtime)
-               VALUES ($1, $2, $3, '', CURRENT_TIMESTAMP)
-               RETURNING postid`,
-              [req.session.user.username, title, descriptions]
-          );
-          const postId = post.postid;
-
-          // Save title image
-          const postDir = path.join(__dirname, `images/Post/${postId}`);
-          if (!fs.existsSync(postDir)) fs.mkdirSync(postDir, { recursive: true });
-
-          if (files.titleimg && files.titleimg.filepath) {
-              const titleImgPath = `/images/Post/${postId}/titleimg.jpg`;
-              fs.renameSync(files.titleimg.filepath, path.join(postDir, 'titleimg.jpg'));
-              await db.none(`UPDATE posts SET titleimagepath = $1 WHERE postid = $2`, [titleImgPath, postId]);
-          }
-
-          // Insert tags
-          for (const tagName of tags) {
-              if (tagName.trim()) {
-                  const tag = await db.oneOrNone(
-                      `INSERT INTO tags (tagname) VALUES ($1)
-                       ON CONFLICT (tagname) DO NOTHING
-                       RETURNING tagid`,
-                      [tagName]
-                  );
-
-                  const tagId = tag
-                      ? tag.tagid
-                      : (await db.one(`SELECT tagid FROM tags WHERE tagname = $1`, [tagName])).tagid;
-
-                  await db.none(`INSERT INTO posttags (postid, tagid) VALUES ($1, $2)`, [postId, tagId]);
-              }
-          }
-
-          // Insert sections
-          for (let i = 0; i < sectionTitles.length; i++) {
-            if (!sectionTitles[i] || !sectionContents[i]) continue;
-
-            let sectionImagePath = null; // Default image is null
-
-            // Check if image is valid
-            if (
-                sectionImages[i] &&
-                sectionImages[i].filepath &&
-                sectionImages[i].originalFilename.trim() !== '' &&
-                sectionImages[i].size > 0
-            ) {
-                sectionImagePath = `/images/Post/${postId}/section${i + 1}.jpg`;
-
-                // Move file to specific location
-                fs.renameSync(
-                    sectionImages[i].filepath,
-                    path.join(postDir, `section${i + 1}.jpg`)
-                );
-            }
-
-            // Insert into database
-            await db.none(
-                `INSERT INTO sections (postid, sectiontitle, content, imgpath, createtime)
-                 VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-                [postId, sectionTitles[i], sectionContents[i], sectionImagePath]
-            );
-          }
-
-          res.redirect(`/post/${postId}`);
-      } catch (error) {
-          console.error('Error creating post:', error);
-          res.status(500).render('pages/error', { message: 'An error occurred while creating the post.' });
-      }
-  });
-});
-*/
-
 
 //Search Page
 app.get('/search', async (req, res) => {

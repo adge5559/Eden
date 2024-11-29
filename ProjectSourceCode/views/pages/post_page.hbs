@@ -48,7 +48,7 @@
 
     <!-- main img -->
     <div class="post-image mb-3" style="padding-bottom: 8px; text-align: center;">
-      <img src="data:image;base64,{{post.titleimgbase}}" alt="Title image for post" class="title-image" style="max-width: 100%; height: auto; max-height: 400px; margin-left: 10px; margin-right: 10px;">
+      <img src="{{post.titleimgbase}}" alt="Title image for post" class="title-image" style="max-width: 100%; height: auto; max-height: 400px; margin-left: 10px; margin-right: 10px;">
     </div>
 
     <!-- description -->
@@ -61,9 +61,9 @@
       {{#each sections}}
         <div class="section mb-3">
           <h5>{{this.sectiontitle}}</h5>
-          {{#if this.imgpath}}
+          {{#if this.imgbase}}
             <div class="image-container" style="display: flex; justify-content: center;">
-                <img src="{{this.imgpath}}" alt="{{this.sectiontitle}}" class="section-image" style="width: 400px; height: 250px; object-fit: cover; object-position: center; margin-bottom: 4px;">
+                <img src="{{this.imgbase}}" alt="Image for section" class="section-image" style="width: 400px; height: 400px; object-fit: contain; object-position: center; margin-bottom: 4px;">
             </div>
           {{/if}}
           <p style="margin-bottom: 3rem;">{{this.content}}</p>

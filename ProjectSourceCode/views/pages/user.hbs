@@ -18,7 +18,7 @@
 
 <div class="card border p-4 rounded shadow-sm mx-auto" style="margin: 10px;">
     <h2>{{post.title}}<a href={{postLink}} class="stretched-link"></a></h2>
-    <img class="card-img" src="{{post.titleimagepath}}" alt="{{post.title}}">
+    <img class="card-img" src="{{post.titleimgbase}}" style="object-fit: contain; max-height: 300px;"alt="{{post.title}}">
     <p style="margin-bottom:5px;">{{post.likes}} Likes {{commentCount}} Comments <small>{{post.formattedCreateTime}}</small></p>
 
     <p style="margin-bottom:5px;">
@@ -31,4 +31,3 @@
 
     {{/each}}
 </div>
-

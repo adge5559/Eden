@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS sections(
 	sectionid  SERIAL PRIMARY KEY,
     sectiontitle VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
-    imgpath VARCHAR(60),
-    img BYTEA,
+    imgp text,
+    imgbase text,
     postid INT,
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (postid) REFERENCES posts(postid)

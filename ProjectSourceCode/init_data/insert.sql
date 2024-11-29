@@ -19,13 +19,13 @@ VALUES ('new_user_1', 'Fern',
         'images/fern.jpg', 0);
 
 -- Insert Section 1 for Post1
-INSERT INTO sections (sectiontitle, content, imgpath, postid)
+INSERT INTO sections (sectiontitle, content, imgp, postid)
 VALUES ('Fern Care Tips', 
         'Keep the fern in a humid environment and water it regularly to ensure healthy growth.', 
         'images/fern.jpg', 1);
 
 -- Insert Section 2 for Post1
-INSERT INTO sections (sectiontitle, content, imgpath, postid)
+INSERT INTO sections (sectiontitle, content, imgp, postid)
 VALUES ('Ideal Lighting for Ferns', 
         'Ferns thrive in indirect sunlight. Avoid placing them in direct sunlight, as it may damage the leaves.', 
         'images/fern.jpg', 1);
