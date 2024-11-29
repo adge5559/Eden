@@ -5,8 +5,6 @@ DROP TABLE IF EXISTS sections CASCADE;
 DROP TABLE IF EXISTS tags CASCADE;
 DROP TABLE IF EXISTS posttags CASCADE;
 DROP TABLE IF EXISTS comments CASCADE;
---SAMPLE
-DROP TABLE IF EXISTS plants;
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
@@ -66,11 +64,4 @@ CREATE TABLE IF NOT EXISTS comments (
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (postid) REFERENCES posts(postid)
-);
--- Create table for plants for post SAMPLE
-CREATE TABLE IF NOT EXISTS plants (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  description TEXT NOT NULL,
-  imagepath VARCHAR(255) NOT NULL
 );
