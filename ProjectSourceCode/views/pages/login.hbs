@@ -15,15 +15,13 @@
   {{#if showLoginForm}}
     <form action="/login" method="POST">
       <div class="form-group"> <!--form group for username input -->
-        <label for="username" class="form-label">Username:</label> <!--label for username input-->
-        <input type="text" name="username" id="username" class="form-control" required> <!--trxt input for username-->
+        <label class="form-label" for="username">Username:</label> <!--label for username input-->
+        <input class="form-control" type="text" name="username" id="username" required> <!--trxt input for username-->
+        <br>
+        <label class="form-label" for="password">Password:</label> <!--label for password input -->
+        <input class="form-control" type="password" name="password" id="password" required> <!-- text input for password -->
+        <br>
       </div>
-      <br> 
-      <div class="form-group"> <!--form group for password input -->
-        <label for="password" class="form-label">Password:</label> <!--label for password input -->
-        <input type="password" name="password" id="password" class="form-control" required> <!-- text input for password -->
-      </div>
-      <br> 
       <button type="submit" class="btn btn-navbar-green">Login</button> <!--button has bootstrap-->
       <div class="mt-3"> <!--register linkcontainter-->
         <p>Don't have an account? <a href="/register" style="color: #9DC183;">Register</a></p> <!--link to register page-->

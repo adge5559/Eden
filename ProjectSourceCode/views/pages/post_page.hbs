@@ -12,7 +12,7 @@
     <!-- Post Info Box (Author, Date) -->
     <div class="info-box mb-3 d-flex justify-content-between align-items-center" style="height: 50px;">
       <div>
-        <p> 
+        <p style="margin: 0px"> 
           <a href="/user/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
             <img src="{{user.profilepicture}}" alt="Profile Picture" class="profile-icon" style="width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; margin-right: 5px;">
             <strong>{{user.username}}</strong>
@@ -20,31 +20,12 @@
         </p>
       </div>
       <div class="text-right">
-        <p>
+        <p style="margin: 0px">
           Posted: 
           <small>{{post.formattedCreateTime}}</small>
         </p>
       </div>
     </div>
-
-    
-    {{!-- <!-- image -->
-    <div class="post-image mb-3" style="padding: 0 10px;">
-      <img src="{{post.titleimagepath}}" alt="{{post.title}}" class="title-image" style="width: 100%; height: auto; max-height: 400px;">
-    </div>
-
-    <!-- content section -->
-    <div class="post-content mb-4">
-      {{#each sections}}
-        <div class="section mb-3">
-          <h5>{{this.sectiontitle}}</h5>
-          <div class="section-image-wrapper" style="padding: 0 10px;">
-            <img src="{{this.imgpath}}" alt="{{this.sectiontitle}}" class="section-image" style="width: 100%; height: auto; max-height: 200px; margin-bottom: 10px;">
-          </div>
-          <p>{{this.content}}</p>
-        </div>
-      {{/each}}
-    </div> --}}
 
     <!-- main img -->
     <div class="post-image mb-3" style="padding-bottom: 8px; text-align: center;">
@@ -70,7 +51,6 @@
         </div>
       {{/each}}
     </div>
-
 
     <!-- tags -->
     <div class="tags-section mb-4">
