@@ -19,11 +19,11 @@ CREATE TABLE IF NOT EXISTS users (
 -- Create posts table
 CREATE TABLE IF NOT EXISTS posts(
 	postid SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    title VARCHAR(40) NOT NULL,
+    username text NOT NULL,
+    title text NOT NULL,
     descriptions TEXT NOT NULL,
-    titleimagepath VARCHAR(60),
-    titleimgb BYTEA,
+    titleimgp text,
+    titleimgbase text,
     likes INT NOT NULL DEFAULT 0,
     users_who_liked text[],
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

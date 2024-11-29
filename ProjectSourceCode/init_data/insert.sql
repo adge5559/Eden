@@ -13,22 +13,22 @@ VALUES ('Eden', '123');
 
 
 -- Insert Post1
-INSERT INTO posts (username, title, descriptions, titleimagepath, likes)
+INSERT INTO posts (username, title, descriptions, titleimgp, likes)
 VALUES ('new_user_1', 'Fern', 
         'This fern thrives in humid conditions and is perfect for indoor environments.', 
-        '/images/Post/1/titleimg.jpg', 0);
+        'images/fern.jpg', 0);
 
 -- Insert Section 1 for Post1
 INSERT INTO sections (sectiontitle, content, imgpath, postid)
 VALUES ('Fern Care Tips', 
         'Keep the fern in a humid environment and water it regularly to ensure healthy growth.', 
-        '/images/Post/1/section1.jpg', 1);
+        'images/fern.jpg', 1);
 
 -- Insert Section 2 for Post1
 INSERT INTO sections (sectiontitle, content, imgpath, postid)
 VALUES ('Ideal Lighting for Ferns', 
         'Ferns thrive in indirect sunlight. Avoid placing them in direct sunlight, as it may damage the leaves.', 
-        '/images/Post/1/section2.jpg', 1);
+        'images/fern.jpg', 1);
 
 -- Insert Comment 1 for Post1
 INSERT INTO comments (postid, username, commenttext)
@@ -51,27 +51,27 @@ VALUES
 (1, 2);
 
 -- Insert Cactus post
-INSERT INTO posts (username, title, descriptions, titleimagepath, likes)
+INSERT INTO posts (username, title, descriptions, titleimgp, likes)
 VALUES ('new_user_1', 'Cactus', 
         'A hardy plant that requires minimal care, great for dry climates and bright sunlight.', 
-        '/images/Post/2/titleimg.jpg', 0);
+        'images/catus.jpg', 0);
 
 
 -- Insert Succulent post
-INSERT INTO posts (username, title, descriptions, titleimagepath, likes)
+INSERT INTO posts (username, title, descriptions, titleimgp, likes)
 VALUES ('new_user_2', 'Succulent', 
         'This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.', 
-        '/images/Post/3/titleimg.jpg', 0);
+        'images/succulent.jpg', 0);
 
 
 -- I will create a button where it gives you a random plant to look at
 /*
 INSERT INTO plants (name, description, imagepath)
 VALUES
-    ('Fern', 'This fern thrives in humid conditions and is perfect for indoor environments.', '/images/fern.jpg'),
-    ('Cactus', 'A hardy plant that requires minimal care, great for dry climates and bright sunlight.', '/images/catus.jpg'),
-    ('Succulent', 'This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.', '/images/succulent.jpg'),
-    ('Spider Plant', 'An easy-to-care-for plant known for its air-purifying qualities.', '/images/houseplants.jpeg'),
+    ('Fern', 'This fern thrives in humid conditions and is perfect for indoor environments.', 'images/fern.jpg'),
+    ('Cactus', 'A hardy plant that requires minimal care, great for dry climates and bright sunlight.', 'images/catus.jpg'),
+    ('Succulent', 'This plant stores water in its leaves and is low-maintenance, ideal for a busy lifestyle.', 'images/succulent.jpg'),
+    ('Spider Plant', 'An easy-to-care-for plant known for its air-purifying qualities.', 'images/houseplants.jpeg'),
     ('Snake Plant', 'A resilient plant that requires little water and thrives in low light.', 'images/houseplants.jpeg'),
     ('Peace Lily', 'A flowering plant that enjoys indirect light and high humidity.', 'images/houseplants.jpeg'),
     ('Pothos', 'A fast-growing vine that is perfect for beginners, thriving in low light.', 'images/houseplants.jpeg'),
@@ -108,9 +108,9 @@ VALUES
     ('Hoya', 'A waxy, vining plant that sometimes produces fragrant flowers.', 'images/houseplants.jpeg'),
     ('Anthurium', 'A flowering plant known for its heart-shaped leaves and bright blooms.', 'images/houseplants.jpeg');
     */
-INSERT INTO posts (username, title, descriptions, titleimagepath, likes)
+INSERT INTO posts (username, title, descriptions, titleimgp, likes)
 VALUES
-    ('Eden', 'Spider Plant', 'An easy-to-care-for plant known for its air-purifying qualities.', '/images/houseplants.jpeg', 0),
+    ('Eden', 'Spider Plant', 'An easy-to-care-for plant known for its air-purifying qualities.', 'images/houseplants.jpeg', 0),
     ('Eden', 'Snake Plant', 'A resilient plant that requires little water and thrives in low light.', 'images/houseplants.jpeg', 0),
     ('Eden', 'Peace Lily', 'A flowering plant that enjoys indirect light and high humidity.', 'images/houseplants.jpeg', 0),
     ('Eden', 'Pothos', 'A fast-growing vine that is perfect for beginners, thriving in low light.', 'images/houseplants.jpeg', 0),

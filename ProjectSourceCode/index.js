@@ -75,25 +75,22 @@ app.use(
   })
 );
 
-//paths
 
-app.get('/', (req, res) => {res.redirect('/discover');});
-app.get('/discover', async (req, res) => {
-  try {
-    // Fetch all posts from the database
-    const posts = await db.query('SELECT postid, title, titleimagepath, descriptions FROM posts'); // Adjust query as needed
+//convert all the imgp's to imgb's
+async function convertAllImgpToImgb(){
+  const postIDs = await db.any('SELECT postid FROM posts')
 
-    // Render the page and pass the posts data
-    res.render('pages/discover', { posts });
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    res.status(500).send('An error occurred while fetching posts.');
+  for(const count in postIDs){
+    const postID = postIDs[count].postid
+    const post = await db.one(`SELECT * FROM posts WHERE postid = $1`, [postID]);
+    var imgBuffer = fs.readFileSync(path.resolve(__dirname, post.titleimgp), function(err, buffer){})
+    await db.none('UPDATE posts SET titleimgbase = $1 WHERE postid = $2', [imgBuffer.toString('base64'), postID]);
   }
-});
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
-});
+}
 
+convertAllImgpToImgb()
+
+//paths
 const PORT = process.env.PORT || 3000; // Port provided by Render
 const HOST = '0.0.0.0'; // Bind to all interfaces
 
@@ -102,6 +99,22 @@ app.listen(PORT, HOST, () => {
 });
 
 module.exports = app; // Export the app for testing or modularization
+
+app.get('/', (req, res) => {res.redirect('/discover');});
+app.get('/discover', async (req, res) => {
+  try {
+    // Fetch all posts from the database
+    const posts = await db.query('SELECT postid, title, titleimgbase, descriptions FROM posts'); // Adjust query as needed
+    // Render the page and pass the posts data
+    res.render('pages/discover', { posts});
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).send('An error occurred while fetching posts.');
+  }
+});
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
 
 //register
 app.get('/register', (req, res) => {
@@ -312,12 +325,8 @@ app.get('/post/:id', async(req, res) => {
 
   try {
     //retreives the post with this postID from the posts table
-    const post = await db.oneOrNone(
-      `SELECT * FROM posts 
-      WHERE postid = $1`, 
-      [postId]);
-
-      const imgData = post.titleimgb.toString('base64')
+    const post = await db.oneOrNone(`SELECT * FROM posts WHERE postid = $1`, [postId]);
+    console.log(post)
 
     //is no such post exists...error
     if (!post) {
@@ -390,9 +399,8 @@ app.get('/post/:id', async(req, res) => {
       tags,
       sections,
       is_logged_in: req.session.user,
-      img_data: imgData
     });
-  } catch (error) { //errors
+  } catch (err) { //errors
     console.log(err);
     res.render('pages/error', {message: 'Post not found'});
   }
@@ -482,11 +490,12 @@ app.get('/upload', (req, res) => {
 });
  
 app.post('/create-post', upload.any(), async function (req, res) {
-  var titleimgb
+  var titleimgbase
   for(file in req.files){
     if(req.files[file].fieldname == "titleimg"){
-      titleimgb = req.files[file].buffer;
+      const titleimgb = req.files[file].buffer;
       console.log(typeof(req.files[file].buffer))
+      titleimgbase = titleimgb.toString('base64')
       break
     }
   }
@@ -494,8 +503,8 @@ app.post('/create-post', upload.any(), async function (req, res) {
   var title = req.body.title
   var descriptions = req.body.descriptions
 
-  const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgb, createtime)
-    VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgb]);
+  const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgbase, createtime)
+    VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgbase]);
 
   console.log(post)
   res.redirect(`/post/${post.postid}`);
