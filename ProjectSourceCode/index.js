@@ -75,24 +75,6 @@ app.use(
   })
 );
 
-
-//convert all the imgp's to imgb's
-async function convertAllImgpToImgb(){
-  const postIDs = await db.any('SELECT postid FROM posts')
-
-  for(const count in postIDs){
-    const postID = postIDs[count].postid
-    const post = await db.one(`SELECT * FROM posts WHERE postid = $1`, [postID]);
-    //Only convert if the post has a title img path
-    if(post.titleimgp){
-      var imgBuffer = fs.readFileSync(path.resolve(__dirname, post.titleimgp), function(err, buffer){})
-      await db.none('UPDATE posts SET titleimgbase = $1 WHERE postid = $2', ["data:image/png;base64," + imgBuffer.toString('base64'), postID]);
-    }
-  }
-}
-
-convertAllImgpToImgb()
-
 //paths
 const PORT = process.env.PORT || 3000; // Port provided by Render
 const HOST = '0.0.0.0'; // Bind to all interfaces
