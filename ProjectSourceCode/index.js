@@ -1,25 +1,15 @@
-
-
-
-
-/////////////////////////////////////
 const express = require('express'); // To build an application server or API
 const app = express();
 const handlebars = require('express-handlebars');
-const Handlebars = require('handlebars');
 const path = require('path');
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
-const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
-const fs = require("fs");
-const {IncomingForm} = require('formidable');
-
 const multer  = require('multer')
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage })
 
+const storage = multer.memoryStorage()
+const upload = multer({storage: storage})
 
 //allows images to be rendered
 app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -32,7 +22,6 @@ const hbs = handlebars.create({
   layoutsDir: __dirname + '/views/layouts',
   partialsDir: __dirname + '/views/partials',
 });
-
 
 // database configuration
 const dbConfig = {
