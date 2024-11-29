@@ -107,7 +107,7 @@ app.get('/', (req, res) => {res.redirect('/discover');});
 app.get('/discover', async (req, res) => {
   try {
     // Fetch all posts from the database
-    const posts = await db.query('SELECT postid, title, titleimgbase, descriptions FROM posts'); // Adjust query as needed
+    const posts = await db.query('SELECT postid, title, titleimgbase, descriptions FROM posts ORDER BY createtime DESC');
     // Render the page and pass the posts data
     res.render('pages/discover', { posts});
   } catch (error) {
@@ -265,7 +265,7 @@ app.get("/user/:username", async (req, res) => {
     res.render('pages/profileerr', { message: 'User not found.', error: true });
   } else{
 
-    const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1`, [req.params.username]);
+    const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1 ORDER BY createtime DESC`, [req.params.username]);
     
     let posts = []
 
