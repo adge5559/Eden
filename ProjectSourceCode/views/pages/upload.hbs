@@ -42,25 +42,10 @@
         <!-- Sections -->
         <div id="sections-container">
             <h2 style="color:green">Sections (Max 10)</h2>
-            <p>You can add up to 10 sections. For each section, a title and content are required.</p>
+            <p>Use sections to add additional paragraphs and images to your post.</p>
 
-            <!-- Initial Section -->
-            <div class="section-box mb-4">
-                <hr>
-                <h3>Section <span class="section-number">1</span></h3>
-                <div class="form-group">
-                    <label for="section-title-1">Section Title</label>
-                    <input type="text" id="section-title-1" name="sectiontitle1" class="form-control" maxlength="255" placeholder="Enter section title">
-                </div>
-                <div class="form-group">
-                    <label for="section-content-1">Section Content</label>
-                    <textarea id="section-content-1" name="content1" class="form-control" maxlength="2000" placeholder="Enter section content"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="section-image-1">Section Image:</label>
-                    <input type="file" id="section-image-1" name="imgpath1" class="form-control-file" accept="image/*">
-                </div>
-            </div>
+            <!-- Sections will be inserted here -->
+            
         </div>
 
         <!-- Add Section Button -->
@@ -84,12 +69,10 @@
         // Add new section
         addSectionBtn.addEventListener('click', function () {
             // Prevent exceeding maximum sections
-            if (sectionCount >= maxSections) {
+            if (sectionCount > maxSections) {
                 alert(`You can only add up to ${maxSections} sections.`);
                 return;
             }
-
-            sectionCount++;
 
             // Create a new section
             const newSection = document.createElement('div');
@@ -111,6 +94,7 @@
                 </div>
             `;
             sectionsContainer.appendChild(newSection);
+            sectionCount++;
         });
 
         // Add new tag

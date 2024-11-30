@@ -480,7 +480,7 @@ app.post('/create-post', upload.any(), async function (req, res) {
   // Process and store post sections
       var sectionsArr = new Array()
   
-      for(let counter = 1; counter < 15; counter++){
+      for(let counter = 1; counter <= 10; counter++){
         var sectionTitle = req.body['sectiontitle' + counter]
         var content = req.body['content' + counter]
         sectionTitle = (sectionTitle == undefined) ? "" : sectionTitle
