@@ -12,27 +12,6 @@ chai.should();
 chai.use(chaiHttp);
 const {assert, expect} = chai;
 
-// ********************** DEFAULT WELCOME TESTCASE ****************************
-
-describe('Server!', () => {
-  // Sample test case given to test / endpoint.
-  it('Returns the default welcome message', done => {
-    chai
-      .request(server)
-      .get('/welcome')
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equals('success');
-        assert.strictEqual(res.body.message, 'Welcome!');
-        done();
-      });
-  });
-});
-
-// *********************** TODO: WRITE 2 UNIT TESTCASES **************************
-
-// ********************************************************************************
-
 describe('Testing register 1', () => {
   it('test route should redirect to /login', done => {
     chai
@@ -60,7 +39,7 @@ describe('Testing register 2', () => {
   });
 });
 
-describe('Testing profile', () => {
+describe('Testing profile 1', () => {
   it('should not accept wrong credentials and display you are not logged in profile page', async() => {
     let agent = chai.request.agent(server);
     await agent.post('/login').send({username: 'Jane Doe', password: 'Wrong password'});
@@ -72,12 +51,24 @@ describe('Testing profile', () => {
   });
 });
 
-describe('Testing profile', () => {
+describe('Testing profile 2', () => {
   it('should accept credentials and display correct profile page', async() => {
     let agent = chai.request.agent(server);
     await agent.post('/login').send({username: 'Jane Doe', password: 'Then, he used his fight money to buy two of every animal on earth'});
 
     const res = await agent.get("/profile")
+    res.should.have.status(200);
+    res.should.be.html;
+    expect(res.text.indexOf("Jane Doe") !== -1).to.equal(true)
+  });
+});
+
+describe('Testing main website endpoint', () => {
+  it('should display the discover page and have the username', async() => {
+    let agent = chai.request.agent(server);
+    await agent.post('/login').send({username: 'Jane Doe', password: 'Then, he used his fight money to buy two of every animal on earth'});
+
+    const res = await agent.get("/")
     res.should.have.status(200);
     res.should.be.html;
     expect(res.text.indexOf("Jane Doe") !== -1).to.equal(true)

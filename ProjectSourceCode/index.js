@@ -328,7 +328,7 @@ app.get('/post/:id', async (req, res) => {
       });
     });
 
-
+    //add user pfps to comments
     comments.forEach(async comment => {
       const pfp = await db.one(`SELECT pfpbase FROM users WHERE username = $1`, [comment.username]);
       comment.pfpbase = pfp.pfpbase
@@ -473,7 +473,7 @@ app.post('/create-post', upload.any(), async function (req, res) {
       // Insert main post details
       const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgbase, createtime)
         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgbase]);
-  // Process and store post sections
+      // Process and store post sections
       var sectionsArr = new Array()
   
       for(let counter = 1; counter <= 10; counter++){

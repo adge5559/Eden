@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS posts(
 -- Create sections table
 CREATE TABLE IF NOT EXISTS sections(
 	sectionid  SERIAL PRIMARY KEY,
-    sectiontitle VARCHAR(255) NOT NULL,
+    sectiontitle text NOT NULL,
     content TEXT NOT NULL,
     imgbase text,
     postid INT,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS sections(
 -- Create tags table
 CREATE TABLE IF NOT EXISTS tags(
 	tagid SERIAL PRIMARY KEY,
-    tagname VARCHAR(50) UNIQUE
+    tagname text UNIQUE
 );
 
 -- Create posttags table (associate posts and tags)
