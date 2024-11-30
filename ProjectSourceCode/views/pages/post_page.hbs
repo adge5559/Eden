@@ -54,6 +54,7 @@
 
     <!-- tags -->
     <div class="tags-section mb-4">
+      <!-- Clickable tags that link to search results -->
       {{#each tags}}
         <a href="/search?query={{this.tagname}}" class="tag-button btn btn-outline-primary btn-sm mr-2 mb-2">{{this.tagname}}</a>
       {{/each}}
@@ -63,11 +64,13 @@
   <div class="post-wrapper border p-4 rounded shadow-sm mx-auto" style="max-width: 800px; margin-top: 15px; background-color: #fff;">
     <!-- like button -->
       {{#if is_logged_in}}   
+       <!-- Conditional Like Button (shown only to logged-in users) -->
         <div class="like-section mb-4">
         <button class="like-button btn btn-light" data-post-id="{{post.postid}}">👍 Like</button>
         <span class="like-count ml-2" id="like-count-{{post.postid}}">{{post.likes}} Likes</span>
         </div>
       {{else}}
+      <!-- Login prompt for non-logged-in users -->
           <p class="login-message">You must <a href="/login">log in</a> to like a post.</p>
       {{/if}}
   </div>
@@ -89,6 +92,7 @@
       <div id="comments-list">
         {{#each comments}}
           <div class="comment-box mb-3">
+            <!-- Comment Author and Timestamp -->
             <p>
               <a href="/user/{{this.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
                 <strong>{{this.username}}</strong>
@@ -107,7 +111,7 @@
 
  
 
-
+<!-- Client-side JavaScript for Like and Comment Functionality -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Like Listener
@@ -118,9 +122,10 @@
         likeButton.addEventListener('click', async function(event) {
             event.preventDefault();
             try {
+               // Send like request to server
                 const response = await fetch(`/post/${postId}/like`, {method: 'POST'});
                 const result = await response.json();
-
+                // Update like count on successful response
                 if (response.ok) {
                     likecount.textContent = `${result.likes} Likes`;
                 } else {
@@ -144,12 +149,13 @@
             if (!commentText) return;
 
             try {
+              // Send comment to server
                 const response = await fetch(`/post/${postId}/comment`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({commentText})
                 });
-
+              // Handle successful comment submission
                 if (response.ok) {
                     const result = await response.json();
 

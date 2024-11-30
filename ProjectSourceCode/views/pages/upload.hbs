@@ -7,7 +7,7 @@
     Post
 </button>
     </div>
-
+     <!-- Post Creation Form -->
     <form id="new-post-form" action="/create-post" method="POST" enctype="multipart/form-data">
         
         <!-- Post Title -->
@@ -32,6 +32,7 @@
         <div id="tags-container" class="mt-4">
             <label>Tags (At least 1):<span class="required text-danger">*</span></label>
             <button type="button" id="add-tag-btn" class="btn btn-tag-green btn-sm mb-2">Add Tag</button>
+            <!-- Initial Tag Input -->
             <div class="tag-box d-flex align-items-center mb-2">
                 <input type="text" name="tags1" class="form-control tag-input" placeholder="Enter a tag" required>
             </div>
@@ -66,14 +67,14 @@
         <button type="button" id="add-section-btn" class="btn btn-section-green">Add Section</button>
     </form>
 </div>
-
+<!-- Client-side JavaScript for Dynamic Form Functionality -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const maxSections = 10;
         const maxTags = 5;
         let sectionCount = 1;
         let tagCount = 1;
-
+        // DOM Element References
         const sectionsContainer = document.getElementById('sections-container');
         const addSectionBtn = document.getElementById('add-section-btn');
         const tagsContainer = document.getElementById('tags-container');
@@ -82,6 +83,7 @@
 
         // Add new section
         addSectionBtn.addEventListener('click', function () {
+            // Prevent exceeding maximum sections
             if (sectionCount >= maxSections) {
                 alert(`You can only add up to ${maxSections} sections.`);
                 return;

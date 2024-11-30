@@ -2,6 +2,7 @@
   <!-- Search Form -->
 <form action="/search" method="GET" class="mb-4" style="margin-top: 20px;">
 <div class="input-group">
+  <!-- Search input field with required attribute to ensure user enters a query -->
 <input type="text" name="query" class="form-control" placeholder="Search for posts" aria-label="Search" aria-describedby="button-search" required>
 <button class="btn" type="submit" id="button-search" style="background-color: #0b680f; color: white;">Search</button>
 </div>
@@ -12,11 +13,14 @@
     {{#each posts}}
     <div class="col-md-4">
       <div class="card mb-4">
+        <!-- Entire card is a clickable link to the full post -->
         <a href="/post/{{postid}}" class="text-decoration-none text-dark">
        <div class="card-header" style="background-color:#9DC183; color: white;">
         <h4 class="card-title" style="margin: 0;">{{title}}</h4>
       </div>
+       <!-- Card image with fallback to default image if loading fails -->
         <img src="{{titleimgbase}}" class="card-img-top" alt="{{title}}" onerror="this.src='/images/default-plant.jpg'">
+        <!-- Card body with post description -->
         <div class="card-body">
           <p class="card-text">{{descriptions}}</p>
         </div>
@@ -24,6 +28,7 @@
       </div>
     </div>
     {{else}}
+    <!-- Displays a message if no posts are found -->
     <div class="col-md-12">
       <p>No posts found.</p>
     </div>

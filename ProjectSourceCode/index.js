@@ -461,20 +461,21 @@ app.post('/post/:id/like', async(req, res) => {
 app.get('/upload', (req, res) => {
   res.render('pages/upload');
 });
- 
+ // Route to create a new post with comprehensive validation and data processing
 app.post('/create-post', upload.any(), async function (req, res) {
   if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.title || !req.body.tags1 || !req.body.descriptions){
     res.render('pages/profileerr', { message: 'Malformed post syntax.', error: true });
   } else{
     try{
+      // Convert title image to base64
       var titleimgbase = "data:" + req.files[0].mimetype + ";base64," + req.files[0].buffer.toString('base64')
 
       var title = req.body.title
       var descriptions = req.body.descriptions
-  
+      // Insert main post details
       const post = await db.one(`INSERT INTO posts (username, title, descriptions, titleimgbase, createtime)
         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING postid`, [req.session.user.username, title, descriptions, titleimgbase]);
-  
+  // Process and store post sections
       var sectionsArr = new Array()
   
       for(let counter = 1; counter < 15; counter++){
@@ -501,7 +502,7 @@ app.post('/create-post', upload.any(), async function (req, res) {
           sectionImg: sectionImg
         })
       }
-  
+  // Insert sections into database
       for (let i = 0; i < sectionsArr.length; i++) {
         if(sectionsArr[i].sectionImg == null){
           await db.none(
@@ -517,14 +518,14 @@ app.post('/create-post', upload.any(), async function (req, res) {
           );
         }
       }
-  
+   // Process and insert tags
       for(let counter = 1; req.body['tags' + counter] != undefined; counter++){
         var tagName = req.body['tags' + counter].trim()
         const tag = await db.oneOrNone(`INSERT INTO tags (tagname) VALUES ($1) ON CONFLICT (tagname) DO NOTHING RETURNING tagid`,[tagName]);
         const tagID = tag ? tag.tagid : (await db.one(`SELECT tagid FROM tags WHERE tagname = $1`, [tagName])).tagid;
         await db.none(`INSERT INTO posttags (postid, tagid) VALUES ($1, $2)`, [post.postid, tagID]);
       }
-  
+  // Redirect to the newly created post
       res.redirect(`/post/${post.postid}`);
     } catch(error){
       console.error('Error creating post:', error);
@@ -534,9 +535,11 @@ app.post('/create-post', upload.any(), async function (req, res) {
 })
 
 //Search Page
+// Route to search posts across title, description, and tags
 app.get('/search', async (req, res) => {
   const { query } = req.query;
   try {
+    // Perform case-insensitive search across posts and tags
     const posts = await db.any(`
       SELECT DISTINCT p.* 
       FROM posts p
@@ -546,7 +549,7 @@ app.get('/search', async (req, res) => {
          OR p.descriptions ILIKE $2
          OR t.tagname ILIKE $3
     `, [`%${query}%`, `%${query}%`, `%${query}%`]);
-
+    // Render search results
     res.render('pages/discover', { posts });
   } catch (error) {
     console.error('Error searching for posts:', error);

@@ -1,22 +1,26 @@
 {{> head}}
 {{> message}}
 <div class="usermain">
-        
+        {{! Conditionally show Edit Profile button for the user's own profile }}
         {{#if isSelf}}
             <a class="btn btn-navbar-green" style="float: right;" href="/editprofile">Edit Profile</a>
             <br>
         {{/if}}
+        {{! User profile section }}
         <img class="userpfp" src={{user.profilepicture}}>
         <h1>{{user.username}}</h1>
         <p>{{user.bio}}</p>
+        {{! Create Post button for user's own profile }}
         {{#if isSelf}}
             <a class="btn btn-navbar-green" href="/upload">Create Post</a>
         {{/if}}
         <br>
         <br>
+        {{! Iterate through and display user's posts }}
     {{#each posts}}
 
 <div class="card border p-4 rounded shadow-sm mx-auto" style="margin: 10px;">
+    {{! Post with it's metadata}}
     <h2>{{post.title}}<a href={{postLink}} class="stretched-link"></a></h2>
     <img class="card-img" src="{{post.titleimgbase}}" style="object-fit: contain; max-height: 300px;"alt="{{post.title}}">
     <p style="margin-bottom:5px;">{{post.likes}} Likes {{commentCount}} Comments <small>{{post.formattedCreateTime}}</small></p>

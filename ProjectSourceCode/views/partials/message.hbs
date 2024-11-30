@@ -1,3 +1,4 @@
+{{! Display a dynamic alert message with conditional styling based on error status }}
 {{#if message}}
   <div class="alert alert-{{#if error}}danger{{else}}success{{/if}}" role="alert">
     {{ message }}

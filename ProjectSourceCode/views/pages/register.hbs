@@ -1,16 +1,20 @@
 {{> message}}
 <div class="container mt-5">
 <h1>Register</h1>
+<!-- Registration Form -->
     <form action="/register" method="POST">
+    <!-- Username Input Field -->
     <div class="form-group">
       
         <label class="form-label" for="username">Username:</label>
         <input type="text" class="form-control" id="username" name="username" required>
         <br>
+        <!-- Password Input Field -->
         <label class="form-label" for="password">Password:</label>
         <input type="Password" class="form-control" id="password" name="password" required>
         <br>
     </div>
+    <!--submit button -->
     <button type="submit" class="btn btn-navbar-green">Register</button>
     </form>
 </div>
