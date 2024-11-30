@@ -14,7 +14,7 @@
       <div>
         <p style="margin: 0px"> 
           <a href="/user/{{user.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
-            <img src="{{user.profilepicture}}" alt="Profile Picture" class="profile-icon" style="width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; margin-right: 5px;">
+            <img src="{{user.pfpbase}}" alt="Profile Picture" class="profile-icon">
             <strong>{{user.username}}</strong>
           </a>
         </p>
@@ -94,6 +94,7 @@
           <div class="comment-box mb-3">
             <!-- Comment Author and Timestamp -->
             <p>
+              <img src="{{this.pfpbase}}" alt="Profile Picture" class="profile-icon">
               <a href="/user/{{this.username}}" class="profile-link" style="text-decoration: none; color: inherit;">
                 <strong>{{this.username}}</strong>
               </a>
@@ -165,6 +166,7 @@
                     newComment.className = 'comment-box';
                     newComment.innerHTML = `
                         <p>
+                            <img src="${result.pfpbase}" alt="Profile Picture" class="profile-icon">
                             <a href="/user/${result.username}" class="profile-link" style="text-decoration: none; color: inherit;">
                                 <strong>${result.username}</strong>
                             </a>

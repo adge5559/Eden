@@ -201,31 +201,23 @@ app.get("/editprofile", async (req, res) =>{
 })
 
 //Endpoint for submitting the bio form
-app.post('/editprofile', async (req, res) => {
-  const bio = req.body.bio;
-  const username = req.session.user?.username;
-  if(username){
-    await db.none('UPDATE users SET bio = $1 WHERE username = $2', [bio, username]);
-    res.redirect("profile")
-  } else{
+app.post('/editprofile', upload.any(), async function (req, res) {
+  if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.bio){
+    res.render('pages/profileerr', { message: 'Malformed request to update profile.', error: true });
+  } else if(!req.session.user?.username){
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+  } else{
+    try{
+      var newpfp = "data:" + req.files[0].mimetype + ";base64," + req.files[0].buffer.toString('base64')
+
+      await db.none('UPDATE users SET (bio, pfpbase) = ($1, $2) WHERE username = $3', [req.body.bio, newpfp, req.session.user.username]);
+      res.redirect('/profile')
+    } catch(error){
+      console.error('Error updating profile details. ' + error);
+      res.status(500).render('pages/error', { message: 'Error updating profile details. ' + error });
+    }
   }
 });
-
-//Endpoint for submitting the profile picture. The pictures must be named number.webp where number is an integer
-app.post('/editprofilepic/:id', async (req, res) => {
-  const username = req.session.user?.username;
-  //The 2-4th part of this boolean expression verify that id is a valid profile picture number. The hardcoded references are the ids of the first and last profile picture
-  //The profile pictures must be in sequential order in the folder
-  if(username && !isNaN(req.params.id) && (Number(req.params.id) >= 1) && (Number(req.params.id) <= 7)){
-    var profilepicture = "/images/ProfilePicture/" + Number(req.params.id) + ".webp"
-    await db.none('UPDATE users SET profilepicture = $1 WHERE username = $2', [profilepicture, username]);
-    res.redirect("/profile")
-  } else{
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
-  }
-});
-
 
 //Displays the user page for the username given in :username (req.params.username)
 //The profile page contains the username, profile picture, bio, and all of the users posts displayed in cards
@@ -237,14 +229,12 @@ app.get("/user/:username", async (req, res) => {
   } else{
 
     const userPostIDs = await db.any(`SELECT postid FROM posts WHERE username = $1 ORDER BY createtime DESC`, [req.params.username]);
-    
     let posts = []
 
     for(const postIDObj of userPostIDs){
       //The psql query for postid's returns an array of objects with a property called "postid" which corresponds to the actual post id, which is why the id is obtained through postIDObj.postid
       const postID = postIDObj.postid
       try {
-
         const post = await db.oneOrNone('SELECT * FROM posts WHERE postid = ' + postID);
         
         //Error case for if the post associated with an id can't be found
@@ -294,7 +284,7 @@ app.get("/user/:username", async (req, res) => {
 });
 
 // Post page
-app.get('/post/:id', async(req, res) => {
+app.get('/post/:id', async (req, res) => {
   const postId = req.params.id; //gets the id param from the url (:id)
 
   try {
@@ -318,7 +308,7 @@ app.get('/post/:id', async(req, res) => {
 
     //get user info for post
     const user = await db.oneOrNone(
-      `SELECT username, profilepicture FROM users 
+      `SELECT username, pfpbase FROM users 
       WHERE username = $1`, 
       [post.username]);
 
@@ -341,6 +331,12 @@ app.get('/post/:id', async(req, res) => {
       });
     });
 
+
+    comments.forEach(async comment => {
+      const pfp = await db.one(`SELECT pfpbase FROM users WHERE username = $1`, [comment.username]);
+      comment.pfpbase = pfp.pfpbase
+    });
+
     //get the posts tags
     const tags = await db.any(`
       SELECT tags.tagname 
@@ -355,7 +351,6 @@ app.get('/post/:id', async(req, res) => {
       WHERE postid = $1 
       ORDER BY createtime ASC`
       , [postId]);
-
 
     //get the description of the post
     const descriptions = await db.any(
@@ -404,6 +399,10 @@ app.post('/post/:postid/comment', async(req, res) => {
       , [postId, username, commentText]
     );
 
+    const pfp = await db.one(`SELECT pfpbase FROM users WHERE username = $1`, [username]);
+
+    console.log(pfp)
+
     //creates an object for the new comment, containing th data below
     const newComment = {
       postid: postId,
@@ -416,7 +415,8 @@ app.post('/post/:postid/comment', async(req, res) => {
         hour: '2-digit',
         minute: '2-digit',
         timeZone: 'America/Denver'
-      })
+      }),
+      pfpbase: pfp.pfpbase
     };
 
     res.json(newComment); //shows/updates the comment on the users page without them having to refresh
@@ -465,6 +465,8 @@ app.get('/upload', (req, res) => {
 app.post('/create-post', upload.any(), async function (req, res) {
   if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.title || !req.body.tags1 || !req.body.descriptions){
     res.render('pages/profileerr', { message: 'Malformed post syntax.', error: true });
+  } else if(!req.session.user){
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
   } else{
     try{
       // Convert title image to base64

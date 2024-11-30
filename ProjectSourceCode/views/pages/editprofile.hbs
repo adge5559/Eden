@@ -2,7 +2,7 @@
 <div class="editmain">
     <h1>Edit Profile</h1>
     <!-- Form to update user bio -->
-    <form action="/editprofile" method="POST">
+    <form action="/editprofile" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="username" class="form-label">Username</label>
             <input class="form-control" id="username" type="text" placeholder={{user.username}} disabled>
@@ -10,34 +10,9 @@
             <label for="bio" class="form-label">About me</label>
             <textarea class="form-control" id="bio" name="bio" rows="3">{{user.bio}}</textarea>
             <br>
-            <button type="submit" class="btn btn-navbar-green">Update Bio</button>
+            <label for="pfp" class="form-label">Profile Picture</label>
+            <input type="file" id="pfp" name="pfp" accept="image/*">
+            <button type="submit" class="btn btn-navbar-green">Update Profile</button>
         </div>
     </form>
-    <br>
-    <label class="form-label">Profile Picture</label>
-    <br>
-    <!-- Multiple forms for selecting different profile pictures 
-         Each form submits to a different endpoint to change profile picture -->
-    <form class="formcl" action="/editprofilepic/1" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/1.webp" type="submit" />
-    </form>
-    <form class="formcl" action="/editprofilepic/2" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/2.webp" type="submit" />
-    </form>
-    <form class="formcl" action="/editprofilepic/3" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/3.webp" type="submit" />
-    </form>
-    <form class="formcl" action="/editprofilepic/4" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/4.webp" type="submit" />
-    </form>
-    <form class="formcl" action="/editprofilepic/5" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/5.webp" type="submit" />
-    </form>
-    <form class="formcl" action="/editprofilepic/6" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/6.webp" type="submit" />
-    </form>
-    <form class="formcl" action="/editprofilepic/7" method="POST">
-        <input type="image" class="editimg" src="/images/ProfilePicture/7.webp" type="submit" />
-    </form>
-    <br> 
 </div>
