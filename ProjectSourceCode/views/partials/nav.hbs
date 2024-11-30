@@ -6,9 +6,6 @@
         <li class="nav-item me-4">
           <a class="btn btn-outline-light" href="/discover">Discover</a>
         </li>
-        <li class="nav-item me-5">
-          <a class="btn btn-outline-light" href="/profile">Profile</a>
-        </li>
       </ul>
 
       <!-- EDEN in the center -->
@@ -16,13 +13,19 @@
   <span class="fs-1" style="color: #09570d; font-weight: bold; letter-spacing: 4px; font-size: 3rem;">EDEN</span>
 </div>
 
-
       <!-- Login and Logout links on the right -->
       <ul class="navbar-nav ms-auto">
+        {{#if userdetails}}
+        <li class="nav-item me-2">
+          <a class="btn btn-outline-light" href="/profile">{{userdetails}}</a>
+        </li>
+        {{/if}}
+        {{#unless userdetails}}
         <li class="nav-item me-2">
           <a class="btn btn-outline-light" href="/login">Login</a>
         </li>
-        <li class="nav-item me-3">
+        {{/unless}}
+        <li class="nav-item me-2">
           <a class="btn btn-outline-light" href="/logout">Logout</a>
         </li>
       </ul>

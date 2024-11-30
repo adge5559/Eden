@@ -80,19 +80,16 @@ app.get('/discover', async (req, res) => {
     // Fetch all posts from the database
     const posts = await db.query('SELECT postid, title, titleimgbase, descriptions FROM posts ORDER BY createtime DESC');
     // Render the page and pass the posts data
-    res.render('pages/discover', { posts});
+    res.render('pages/discover', { posts, userdetails: req.session?.user?.username});
   } catch (error) {
     console.error('Error fetching posts:', error);
     res.status(500).send('An error occurred while fetching posts. ' + error);
   }
 });
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
-});
 
 //register
 app.get('/register', (req, res) => {
-  res.render('pages/register'); 
+  res.render('pages/register', { userdetails: req.session?.user?.username}); 
 });
 
 app.post('/register', async (req, res) => {
@@ -118,7 +115,7 @@ app.post('/register', async (req, res) => {
     }
   }
 });
-//login.hbs
+
 //login
 app.get('/login', (req, res) => {
   if (req.session.user) {
@@ -127,7 +124,7 @@ app.get('/login', (req, res) => {
       showLoginForm:false
     });
   }
-  res.render('pages/login', {showLoginForm:true});
+  res.render('pages/login', {showLoginForm:true, userdetails: req.session?.user?.username});
 
 });
 
@@ -167,14 +164,14 @@ app.post('/login', async (req, res) => {
 app.get('/logout', (req, res) => {
   if (!req.session.user) {  //check if user is logged in
     //if not then say to go to the login page
-    return res.render('pages/logout', { message: 'You are not logged in. Please log in first.' });
+    return res.render('pages/logout', { message: 'You are not logged in. Please log in first.', userdetails: req.session?.user?.username});
   }
   else{
     req.session.destroy(err => { //end session
         if (err) { //error
             return res.status(500).send('Unable to log out');
         }
-        res.render('pages/logout', { message: 'Logged out Successfully' });  //logged out !
+        res.render('pages/logout', { message: 'Logged out Successfully', userdetails: req.session?.user?.username});  //logged out !
     });
   }
 });
@@ -182,16 +179,16 @@ app.get('/logout', (req, res) => {
 app.get('/profile', (req, res) => {
   //If there is no logged in user, req.session.user is undefined, and trying to access undefined.username crashes the web server
   //user?.username short circuits to undefined if user is undefined or null
-  const username = req.session.user?.username;
+  const username = req.session?.user?.username;
   if(username){
     res.redirect('/user/' + username);
   } else{
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true, userdetails: req.session?.user?.username});
   }
 });
 
 app.get("/editprofile", async (req, res) =>{
-  const username = req.session.user?.username;
+  const username = req.session?.user?.username;
   if(username){
     const userSearch = await db.oneOrNone('SELECT * FROM users WHERE username = $1', username);
     res.render("pages/editprofile", {user: userSearch});
@@ -203,9 +200,9 @@ app.get("/editprofile", async (req, res) =>{
 //Endpoint for submitting the bio form
 app.post('/editprofile', upload.any(), async function (req, res) {
   if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.bio){
-    res.render('pages/profileerr', { message: 'Malformed request to update profile.', error: true });
-  } else if(!req.session.user?.username){
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+    res.render('pages/profileerr', { message: 'Malformed request to update profile.', error: true, userdetails: req.session?.user?.username});
+  } else if(!req.session?.user?.username){
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true, userdetails: req.session?.user?.username});
   } else{
     try{
       var newpfp = "data:" + req.files[0].mimetype + ";base64," + req.files[0].buffer.toString('base64')
@@ -214,7 +211,7 @@ app.post('/editprofile', upload.any(), async function (req, res) {
       res.redirect('/profile')
     } catch(error){
       console.error('Error updating profile details. ' + error);
-      res.status(500).render('pages/error', { message: 'Error updating profile details. ' + error });
+      res.status(500).render('pages/error', { message: 'Error updating profile details. ' + error, userdetails: req.session?.user?.username});
     }
   }
 });
@@ -269,7 +266,7 @@ app.get("/user/:username", async (req, res) => {
         posts.push({post, commentCount, tags, postLink});
       } catch (error) {
         console.log(error);
-        res.render('pages/error', {message: 'An unexpected error has occurred'});
+        res.render('pages/error', {message: 'An unexpected error has occurred', userdetails: req.session?.user?.username});
       }
     }
     
@@ -279,7 +276,7 @@ app.get("/user/:username", async (req, res) => {
     if(req.session.user && userSearch.username == req.session.user.username){
       viewingOwnPage = true
     }
-    res.render('pages/user', {user: userSearch, posts: posts, isSelf: viewingOwnPage});
+    res.render('pages/user', {user: userSearch, posts: posts, isSelf: viewingOwnPage, userdetails: req.session?.user?.username});
   }
 });
 
@@ -293,7 +290,7 @@ app.get('/post/:id', async (req, res) => {
 
     //is no such post exists...error
     if (!post) {
-      return res.render('pages/error', {message: 'Post not found'});
+      return res.render('pages/error', {message: 'Post not found', userdetails: req.session?.user?.username});
     }
 
     //format for when posts were created
@@ -367,10 +364,11 @@ app.get('/post/:id', async (req, res) => {
       tags,
       sections,
       is_logged_in: req.session.user,
+      userdetails: req.session?.user?.username
     });
   } catch (err) { //errors
     console.log(err);
-    res.render('pages/error', {message: 'Post not found'});
+    res.render('pages/error', {message: 'Post not found', userdetails: req.session?.user?.username});
   }
 });
 
@@ -401,8 +399,6 @@ app.post('/post/:postid/comment', async(req, res) => {
 
     const pfp = await db.one(`SELECT pfpbase FROM users WHERE username = $1`, [username]);
 
-    console.log(pfp)
-
     //creates an object for the new comment, containing th data below
     const newComment = {
       postid: postId,
@@ -425,7 +421,6 @@ app.post('/post/:postid/comment', async(req, res) => {
       res.status(500).json({error: 'An error occurred while posting the comment'});
   }
 });
-
 
 // Likes
 app.post('/post/:id/like', async(req, res) => {
@@ -459,14 +454,15 @@ app.post('/post/:id/like', async(req, res) => {
 
 // Upload Page
 app.get('/upload', (req, res) => {
-  res.render('pages/upload');
+  res.render('pages/upload', {userdetails: req.session?.user?.username});
 });
+
  // Route to create a new post with comprehensive validation and data processing
 app.post('/create-post', upload.any(), async function (req, res) {
   if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.title || !req.body.tags1 || !req.body.descriptions){
-    res.render('pages/profileerr', { message: 'Malformed post syntax.', error: true });
+    res.render('pages/profileerr', { message: 'Malformed post syntax.', error: true, userdetails: req.session?.user?.username});
   } else if(!req.session.user){
-    res.render('pages/profileerr', { message: 'You are not logged in.', error: true });
+    res.render('pages/profileerr', { message: 'You are not logged in.', error: true, userdetails: req.session?.user?.username});
   } else{
     try{
       // Convert title image to base64
@@ -531,7 +527,7 @@ app.post('/create-post', upload.any(), async function (req, res) {
       res.redirect(`/post/${post.postid}`);
     } catch(error){
       console.error('Error creating post:', error);
-      res.status(500).render('pages/error', { message: 'An error occurred while creating the post. ' + error });
+      res.status(500).render('pages/error', { message: 'An error occurred while creating the post. ' + error, userdetails: req.session?.user?.username});
     }
   }
 })
@@ -552,7 +548,7 @@ app.get('/search', async (req, res) => {
          OR t.tagname ILIKE $3
     `, [`%${query}%`, `%${query}%`, `%${query}%`]);
     // Render search results
-    res.render('pages/discover', { posts });
+    res.render('pages/discover', { posts, userdetails: req.session?.user?.username});
   } catch (error) {
     console.error('Error searching for posts:', error);
     res.status(500).send('An error occurred while searching for posts.');
