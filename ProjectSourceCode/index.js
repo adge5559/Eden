@@ -199,15 +199,25 @@ app.get("/editprofile", async (req, res) =>{
 
 //Endpoint for submitting the bio form
 app.post('/editprofile', upload.any(), async function (req, res) {
-  if(!req.files || !req.body || !Buffer.isBuffer(req.files[0].buffer) || !req.body.bio){
+  //Checks that everything is okay, any of the following result in an invalid request
+  //There is no files array
+  //There is no body
+  //The first file exists but does not have a buffer
+  //There is no bio (but a bio that's empty is okay)
+  if(!req.files || !req.body || (req.files[0]?.buffer && !Buffer.isBuffer(req.files[0].buffer)) || (!req.body.bio && !(req.body.bio == ""))){
     res.render('pages/profileerr', { message: 'Malformed request to update profile.', error: true, userdetails: req.session?.user?.username});
   } else if(!req.session?.user?.username){
     res.render('pages/profileerr', { message: 'You are not logged in.', error: true, userdetails: req.session?.user?.username});
   } else{
     try{
-      var newpfp = "data:" + req.files[0].mimetype + ";base64," + req.files[0].buffer.toString('base64')
+      if(req.files[0]?.buffer){
+        var newpfp = "data:" + req.files[0].mimetype + ";base64," + req.files[0].buffer.toString('base64')
 
-      await db.none('UPDATE users SET (bio, pfpbase) = ($1, $2) WHERE username = $3', [req.body.bio, newpfp, req.session.user.username]);
+        await db.none('UPDATE users SET (bio, pfpbase) = ($1, $2) WHERE username = $3', [req.body.bio, newpfp, req.session.user.username]);
+      } else{
+        await db.none('UPDATE users SET bio = $1 WHERE username = $2', [req.body.bio, req.session.user.username]);
+      }
+      
       res.redirect('/profile')
     } catch(error){
       console.error('Error updating profile details. ' + error);

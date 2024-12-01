@@ -72,6 +72,8 @@ How To Run Tests:
     Go to the docker-compose.yaml. Comment out command: 'npm start' and uncomment
     command: 'npm run testandrun'. Run docker compose shutdown -v in order to clear the
     database. Then, run docker compose up to run the tests. The result of the tests will
-    be displayed in the console.
+    be displayed in the console. Be sure to run docker compose shutdown -v before you run the tests.
+    You can combine the reset and run commands with docker compose shutdown -v && docker compose up
+    in order to both reset the database and run the tests with one command
 
 Link to Deployed Application: https://eden-5h1r.onrender.com
