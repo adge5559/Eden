@@ -1,4 +1,4 @@
-# Eden 
+# Eden (no longer live)
 Application Description
 
     Eden is a social media platform created for plant lovers who want to share 
